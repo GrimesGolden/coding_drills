@@ -35,6 +35,30 @@ void clear_buffer() {
     std::cin.clear();
 }
 
+double convert_meters(double num, char unit) {
+    // Converts the given number into meters, based off its unit.
+    // Yes there are magic numbers, too lazy to change. In an ideal world we would have these as some form of constexpr. 
+
+    switch (unit) {
+    case 'c':
+        num = num / 100;
+        break;
+    case 'm':
+        break;
+    case 'i':
+        num = (num * (2.54 / 100));
+        break;
+    case 'f':
+        num = ((num * 12 * 2.54) / 100);
+        break;
+    default:
+        cout << "Conversion error in convert_meters function.\n";
+        break;
+    }
+
+    return num;
+}
+
 int main()
 {
     // Step 1.
@@ -47,17 +71,24 @@ int main()
     // If its largest so far, write "largest so far, after the number."
 
     char input = ' ';
+    string unit = "";
+
     double largest = 0;
     double smallest = 0;
-    double users_num = 0; 
+    double users_num = 0;
+
     bool initial_loop = true;
+    bool valid_unit = false;
+
+    vector<string> units = { "cm", "m", "in", "ft" };
+    vector<double> converted_nums;
 
     while (input != '|') {
         cout << "Enter '|' to quit, or any character to continue.";
         cin >> input;
 
         if (input == '|') {
-            continue; 
+            continue;
         }
 
         clear_buffer();
@@ -69,7 +100,7 @@ int main()
         else {
             cout << "\nEnter another number: ";
         }
-        
+
         if (cin >> users_num) {
             if (initial_loop) {
                 largest = users_num;
@@ -96,8 +127,40 @@ int main()
         cout << "You entered: " << users_num << "\n";
         cout << "The largest number entered so far is: " << largest << "\n";
         cout << "The smallest number entered so far is: " << smallest << "\n";
+        clear_buffer(); 
+        cout << "Enter a unit: ";
+
+        if (cin >> unit) {
+            for (string u : units) {
+                if (unit == u) {
+                    valid_unit = true;
+                }
+            }
+            if (valid_unit) {
+                //convert unit to meters and push
+                cout << "You entered " << users_num << unit << "\n";
+                cout << "Converted to meters this is " << convert_meters(users_num, unit[0]) << "m\n";
+                converted_nums.push_back(convert_meters(users_num, unit[0]));
+                valid_unit = false;
+            }
+            else if (!valid_unit) {
+                cout << "Please enter a valid unit.\n";
+                clear_buffer();
+                continue;
+            }
+        }
+        else {
+            clear_buffer();
+            cout << "Invalid input, how could this happen?\n";
+        }
 
 
-        
+
     }
-}
+    // End while loop
+
+    sort(converted_nums.begin(), converted_nums.end());
+    std::cout << "The smallest value entered was " << converted_nums[0] << "m\n";
+    std::cout << "The largest value entered was " << converted_nums[converted_nums.size() - 1] << "m\n";
+} // End main
+
