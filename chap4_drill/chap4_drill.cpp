@@ -1,5 +1,4 @@
 // chap4_drill.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
 
 #include "std_lib_facilities.h"
 
@@ -42,32 +41,6 @@ char prompt_char() {
     cin >> input;
     clear_buffer();
     return input;
-
-    /*
-    while (input != '|') {
-        cout << "Enter '|' to quit, or any character to continue.\n\n>>";
-        cin >> input;
-
-        if (input == '|') {
-            return;
-        }
-
-        clear_buffer();
-
-        // Prompt for a number.
-        prompt_number(); 
-        // return this number to main
-
-        // if successful prompt for unit.
-        prompt_unit();
-
-        // if unit successfull
-
-        // collect original number, unit, convert it, and then push them to three vectors.
-        // those three vectors are the converted numbers, the original numbers, and their original units. 
-    
-    
-    */
 }
 
 bool valid_unit(string unit) {
@@ -133,17 +106,20 @@ string prompt_unit() {
     return unit; 
 }
 
+void print_results(vector<double>& conv_nums, vector<double> nums, vector<string> units) {
+    sort(conv_nums.begin(), conv_nums.end());
+    std::cout << "The smallest value entered was " << conv_nums[0] << "m\n";
+    std::cout << "The largest value entered was " << conv_nums[conv_nums.size() - 1] << "m\n";
+
+    std::cout << "Your values are as follow: ";
+
+    for (int i = 0; i < conv_nums.size(); ++i) {
+        cout << nums[i] << units[i] << " converted to: " << conv_nums[i] << "m\n";
+    }
+}
+
 int main()
 {
-    // Step 1.
-
-    // Prompt the user for two numbers then print them in a continuous loop.
-    // '|' exits the loop.
-
-    // Step 7. Change the body of the loop, so it reads just one double each time.
-    // Track which is the largest and smallest, if it's smallest so dar write "smallest so far after."
-    // If its largest so far, write "largest so far, after the number."
-
     char input = ' ';
     string unit = "";
 
@@ -187,17 +163,25 @@ int main()
         // Collect unit
         unit = prompt_unit();
 
-
-        cout << "You entered " << users_num << unit << "\n";
-        cout << "Converted to meters this is " << convert_meters(users_num, unit[0]) << "m\n";
+        // Push back the now valid values.
         converted_nums.push_back(convert_meters(users_num, unit[0]));
         unconverted_nums.push_back(users_num);
         users_units.push_back(unit);
+
+        
+        cout << "You entered " << users_num << unit << "\n";
+        cout << "Converted to meters this is " << convert_meters(users_num, unit[0]) << "m\n";
+
+    
+        
     }
     // End while loop
 
-    sort(converted_nums.begin(), converted_nums.end());
-    std::cout << "The smallest value entered was " << converted_nums[0] << "m\n";
-    std::cout << "The largest value entered was " << converted_nums[converted_nums.size() - 1] << "m\n";
+    if (converted_nums.size() <= 1) {
+        cout << "You must enter more than 1 value to analyze results.\n";
+    }
+    else {
+        print_results(converted_nums, unconverted_nums, users_units);
+    }
 } // End main
 
