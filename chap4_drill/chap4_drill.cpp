@@ -3,36 +3,12 @@
 
 #include "std_lib_facilities.h"
 
-void print_smaller(double x, double y) {
-    // Step 5. Change the program do it writes out if the numbers are almost equal.
-    // After determining which is larger or smaller.
-    double smallest = 0;
-    double largest = 0;
 
-    double difference = abs(x - y);
-
-    if (x == y) {
-        cout << "The numbers are equal.\n";
-        return;
-    } else if (x < y) {
-        smallest = x;
-        largest = y;
-    } else if (y < x) {
-        smallest = y;
-        largest = x;
-    }
-  
-    cout << smallest << " is smaller than " << largest << "\n";
-    
-    if (difference <= (1.0 / 100)) {
-        cout << "The numbers are almost equal\n";
-    }
-}
 
 void clear_buffer() {
     // Clears the buffer to prevent errors.
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     std::cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
 double convert_meters(double num, char unit) {
@@ -59,6 +35,104 @@ double convert_meters(double num, char unit) {
     return num;
 }
 
+char prompt_char() {
+    // Prompt user for valid character.
+    char input = ' ';
+    cout << "Enter '|' to quit, or any character to continue.\n\n>>";
+    cin >> input;
+    clear_buffer();
+    return input;
+
+    /*
+    while (input != '|') {
+        cout << "Enter '|' to quit, or any character to continue.\n\n>>";
+        cin >> input;
+
+        if (input == '|') {
+            return;
+        }
+
+        clear_buffer();
+
+        // Prompt for a number.
+        prompt_number(); 
+        // return this number to main
+
+        // if successful prompt for unit.
+        prompt_unit();
+
+        // if unit successfull
+
+        // collect original number, unit, convert it, and then push them to three vectors.
+        // those three vectors are the converted numbers, the original numbers, and their original units. 
+    
+    
+    */
+}
+
+bool valid_unit(string unit) {
+    vector<string> units = { "cm", "m", "in", "ft" };
+    bool valid = false;
+
+    for (string u : units) {
+        if (unit == u) {
+            valid = true;
+        }
+    }
+    return valid;
+}
+
+double prompt_number() {
+    // Collect number from user.
+
+    double num = 0;
+    bool input_required = true;
+
+    while (input_required) {
+        cout << "Enter a number: ";
+
+        if (cin >> num) {
+            // Handle valid input
+            cout << "You entered: " << num << "\n";
+            input_required = false;
+        }
+        else {
+            // Call out invalid input, and clear buffer.
+            cout << "Invalid input.\n\n";
+            clear_buffer();
+            // Return to beginning of while loop.
+        }
+    }
+    cout << "Returning valid number.\n";
+    clear_buffer();
+    return num;
+}
+
+string prompt_unit() {
+    //collect unit from user.
+
+    // Will prompt continuously until valid string acquired. 
+    string unit = "";
+    bool input_required = true;
+
+    while (input_required) {
+        cout << "Enter a unit: ";
+        if (cin >> unit && valid_unit(unit)) {
+            // if the unit is valid collect it.
+            // if invalid prompt for more
+            cout << "Unit successful\n";
+            input_required = false; 
+        }
+        else {
+            cout << "Invalid unit\n";
+            clear_buffer();
+            //continue;
+        }
+    }
+
+    return unit; 
+}
+
 int main()
 {
     // Step 1.
@@ -73,89 +147,52 @@ int main()
     char input = ' ';
     string unit = "";
 
-    double largest = 0;
-    double smallest = 0;
+    vector<double> converted_nums;
+    vector<double> unconverted_nums;
+    vector<string> users_units;
+
     double users_num = 0;
 
-    bool initial_loop = true;
     bool valid_unit = false;
 
-    vector<string> units = { "cm", "m", "in", "ft" };
-    vector<double> converted_nums;
+
+
+    // start the loop.
+
+    // obtain a valid number.
+
+    // obtain a valid unit. 
+
+    // push these to vectors.
+
+    // convert and push.
+
+    // break from while loop. 
+    // finalize and push.
+
 
     while (input != '|') {
-        cout << "Enter '|' to quit, or any character to continue.";
-        cin >> input;
+        // Collect the char
+        input = prompt_char(); 
 
         if (input == '|') {
-            continue;
+            // if input is exit, then go back to the while loop, so it can break out.
+            // We are done. 
+            continue; 
         }
+        
+        // Collect number
+        users_num = prompt_number();
 
-        clear_buffer();
-
-        // Collect input
-        if (initial_loop) {
-            cout << "\nEnter first number: ";
-        }
-        else {
-            cout << "\nEnter another number: ";
-        }
-
-        if (cin >> users_num) {
-            if (initial_loop) {
-                largest = users_num;
-                smallest = users_num;
-                initial_loop = false;
-            }
-        }
-        else {
-            // Call out invalid input, and clear buffer.
-            cout << "Invalid input.\n\n";
-            cin.clear();
-            // Return to beginning of while loop.
-            continue;
-        }
-
-        // Handle input
-        if (users_num < smallest) {
-            smallest = users_num;
-        }
-        else if (users_num > largest) {
-            largest = users_num;
-        }
-
-        cout << "You entered: " << users_num << "\n";
-        cout << "The largest number entered so far is: " << largest << "\n";
-        cout << "The smallest number entered so far is: " << smallest << "\n";
-        clear_buffer(); 
-        cout << "Enter a unit: ";
-
-        if (cin >> unit) {
-            for (string u : units) {
-                if (unit == u) {
-                    valid_unit = true;
-                }
-            }
-            if (valid_unit) {
-                //convert unit to meters and push
-                cout << "You entered " << users_num << unit << "\n";
-                cout << "Converted to meters this is " << convert_meters(users_num, unit[0]) << "m\n";
-                converted_nums.push_back(convert_meters(users_num, unit[0]));
-                valid_unit = false;
-            }
-            else if (!valid_unit) {
-                cout << "Please enter a valid unit.\n";
-                clear_buffer();
-                continue;
-            }
-        }
-        else {
-            clear_buffer();
-            cout << "Invalid input, how could this happen?\n";
-        }
+        // Collect unit
+        unit = prompt_unit();
 
 
-
+        cout << "You entered " << users_num << unit << "\n";
+        cout << "Converted to meters this is " << convert_meters(users_num, unit[0]) << "m\n";
+        converted_nums.push_back(convert_meters(users_num, unit[0]));
+        unconverted_nums.push_back(users_num);
+        users_units.push_back(unit);
     }
     // End while loop
 
