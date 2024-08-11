@@ -42,11 +42,17 @@ int main()
     // Prompt the user for two numbers then print them in a continuous loop.
     // '|' exits the loop.
 
+    // Step 7. Change the body of the loop, so it reads just one double each time.
+    // Track which is the largest and smallest, if it's smallest so dar write "smallest so far after."
+    // If its largest so far, write "largest so far, after the number."
+
     char input = ' ';
+    double largest = 0;
+    double smallest = 0;
+    double users_num = 0; 
+    bool initial_loop = true;
 
     while (input != '|') {
-        double num1 = 0;
-        double num2 = 0;
         cout << "Enter '|' to quit, or any character to continue.";
         cin >> input;
 
@@ -56,10 +62,20 @@ int main()
 
         clear_buffer();
 
-        cout << "\nEnter two numbers: \n" << "First num: >>";
+        // Collect input
+        if (initial_loop) {
+            cout << "\nEnter first number: ";
+        }
+        else {
+            cout << "\nEnter another number: ";
+        }
         
-        if (cin >> num1) {
-            cout << "\nSecond num: >>";
+        if (cin >> users_num) {
+            if (initial_loop) {
+                largest = users_num;
+                smallest = users_num;
+                initial_loop = false;
+            }
         }
         else {
             // Call out invalid input, and clear buffer.
@@ -69,15 +85,19 @@ int main()
             continue;
         }
 
-        if (cin >> num2) {
-            cout << "You entered: " << "First number: " << num1 << "\nSecond number: " << num2 << "\n";
-            print_smaller(num1, num2);
+        // Handle input
+        if (users_num < smallest) {
+            smallest = users_num;
         }
-        else {
-            cout << "Invalid input.\n\n";
-            cin.clear();
-            continue;
-            //return 0;
+        else if (users_num > largest) {
+            largest = users_num;
         }
+
+        cout << "You entered: " << users_num << "\n";
+        cout << "The largest number entered so far is: " << largest << "\n";
+        cout << "The smallest number entered so far is: " << smallest << "\n";
+
+
+        
     }
 }
