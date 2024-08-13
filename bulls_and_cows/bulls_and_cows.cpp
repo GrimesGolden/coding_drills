@@ -156,7 +156,6 @@ void load_game(int& seed, vector<int>& number)
 
     // PreConditions: An integer of any form, and a vector<int> of any valid form.
     // No post conditions due to pass by ref.
-    welcome();
     seed = return_seed();
     number = load_number(seed);
     cout << "Game loaded succesfully.\n";
@@ -213,11 +212,11 @@ bool try_digit(int& digit)
     }
 
 }
-bool get_guess(vector<int>& guess)
+bool loop_guess(vector<int>& guess)
 {
     // Loop through continously, prompting for a guess and calculating accordingly.
     // Pre-Condition: A valid vector of ints, passed by reference. 
-    // Post-condition: A bool determing whether we should quit main loop. True to quit.
+    // Post-condition: A bool determing whether we should quit main loop. False to quit.
     bool quit = false;
 
     for (int i = 0; i < 4; ++i)
@@ -230,14 +229,14 @@ bool get_guess(vector<int>& guess)
         // If they want to quit, simply return at this point.
         {   
             cout << "Exiting Game!";
-            return true;
+            return false;
         }
 
         // Push back the valid digit into the guess.
         guess.push_back(digit);
         cout << "Loading " << digit << "\n";
     }
-    return false;
+    return true;
 
 }
 
@@ -249,15 +248,15 @@ bool play_again()
     bool play = true;
 
     clear_cin();
-    cout << "Press any key to play again, or q to quit. h for help.\n";
+    cout << "You Won!\nPress any key to play again, or q to quit.\n";
     cin >> input;
     clear_cin();
 
     if (input == 'q')
     {
         play = false;
+        cout << "Exiting game!\n";
     }
-
     return play;
 }
 
@@ -296,56 +295,67 @@ vector<int> check_score(vector<int>& number, vector<int>& guess)
     return score;
 }
 
-void loop_game(vector<int>& number, vector<int>& guess)
+bool loop_game(vector<int>& number, vector<int>& guess)
 {   
+    // Change to post condition, loop_game now returns a bool, determining if the user wants to quit.
+  
     // Pre condition: The vector containing a valid number to guess.
     // Another vector containing the users now valid guess.
     // Use these in a loop to determine if the user a) wants to quit. 
     // b) Has won or c) Should continue making guesses. 
-    bool quit = false;
+    // Post condition: a bool determining if the user wants to loop or quit (false to exit).
+    bool loop = true;
     vector<int> score;
+    int seed = 0;
 
-    while (!quit)
+    load_game(seed, number);
+    while (loop)
     {   
-        // Get the guess, and also determine if we should quit.
-        quit = get_guess(guess);
-
-        if (quit) 
-        {   
-            // If the user chose to quit, there is no need to check the score.
-            break; 
+        loop = loop_guess(guess);
+        if (!loop)
+            // If loop is false, the user wants to quit.
+            // So performing any further logic in this loop will cause problems. 
+        {
+            continue;
         }
 
         score = check_score(number, guess);
+        guess.clear();
 
         if (score[0] == 4)
-        {   
-            if (!play_again())
+        {
+            if (play_again())
             {
-                quit = true;
-                break;
-            }
+                load_game(seed, number);
+            } 
             else
             {
-                cout << "You Won!\n";
+                loop = false; 
             }
         }
-
-        guess.clear(); // try to clear the vector here
-    }
+    }// end while
+    return false;
 }
 
 void start_game()
 {
     // Variable definitions.
-    int n = 0;
+    //***int n = 0;
+    int guesses = 0;
+    int wins = 0;
     vector<int> number;
     vector<int> guess;
 
-    // Load the number which the user must guess.
-    load_game(n, number);
-    // Get the users guess;
-    loop_game(number, guess);
+    bool start = true;
+
+    while (start)
+    {   
+        welcome();
+        // Load the number which the user must guess.
+        //***load_game(n, number);
+        // Get the users guess;
+        start = loop_game(number, guess);
+    }
 }
 
 
@@ -356,6 +366,7 @@ int main()
     try
     {
         // Variable definitions.
+        /*
         int n = 0;
         vector<int> number;
         vector<int> guess;
@@ -364,6 +375,8 @@ int main()
         load_game(n, number);
         // Get the users guess;
         loop_game(number, guess);
+        */
+        start_game();
     }
     catch (exception e)
     {
