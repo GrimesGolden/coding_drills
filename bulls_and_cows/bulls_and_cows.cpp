@@ -12,7 +12,7 @@ void welcome()
     cout << "Bull: A digit is correct and in the correct position.\n";
     cout << "Cow: A digit is correct but in the wrong position\n";
     cout << "Guess all four to win! Good luck.\n";
-    cout << "Enter h or 'help' during gameplay to see this message again.";
+    cout << "Enter h or 'help' during gameplay to see this message again.\n";
 }
 
 void clear_cin()
@@ -65,9 +65,44 @@ void display_number(vector<int>& number)
     // Simply displays the given number using a range for loop.
     for (int n : number)
     {
-        cout << "*";
+        cout << n;
     }
     cout << "\n";
+}
+
+bool is_digit(int digit)
+{
+    // Self explan
+    if (digit < 0 || digit > 9)
+    {
+        return false;
+    }
+}
+
+bool is_unique(int digit, vector<int> number)
+{
+    // verify the given digit is unique in the vector
+    for (int n : number)
+    {
+        if (n == digit)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+int get_digit()
+{   
+    // Continuously repeats randint(10)
+    // Until a valid digit is obtained.
+    int digit = randint(10);
+    while (!is_digit(digit))
+    {
+        digit = randint(10);
+    }
+    return digit;
+
 }
 
 vector<int> load_number(int& seed)
@@ -85,23 +120,25 @@ vector<int> load_number(int& seed)
     seed_randint(seed);
 
     // Load the first int.
-    number.push_back(randint(10));
+    int first = get_digit();
+    cout << "First number " << first << "\n";
+    number.push_back(first);
 
     // Loop through the remaining 3 digits.
     // Each time creating a new random digit.
     for (int i = 1; i < max_size; ++i)
     {
-        int new_digit = randint(10);
+        int new_digit = get_digit();
 
-        while (new_digit == number[i - 1])
+        while (!is_unique(new_digit, number))
             // If this digit is not unique (matches a previous digit).
             // Calculate a new random digit and try again.
             // It seems statistically rare this would occur, but its an important failsafe. 
         {   
             cout << "Calculating new seed digit.\n";
-            new_digit = randint(10);
+            new_digit = get_digit();
         }
-
+        cout << "Pushing back digit " << new_digit << "\n";
         number.push_back(new_digit);
     }
 
@@ -124,18 +161,138 @@ void load_game(int& seed, vector<int>& number)
     cout << "Game loaded succesfully.\n";
 }
 
+int char_to_int(char c)
+{   
+    // Uses the fact that '0' in ASCII is '48';
+    // Converts to a correct digit.
+    // Pre condition: Any valid char.
+    // Post condition an integer value.
+    return (int{ c } - '0');
+}
+
+bool try_digit(int& digit)
+{
+    // Obtain a valid guess digit.
+    // PreCondition: an int of any form.
+    // Post condition: true or false. True if user entered quit or false to continue.
+    bool quit = false;
+    char guess = ' ';
+
+    clear_cin();
+
+    while (!quit)
+    {
+        // if its a digit 0-9 its valid.
+       // if its q or quit its quit.
+       // if its h display help.
+        cout << "Enter digit to guess\n";
+        cin >> guess;
+
+        if (guess == 'q')
+        {
+            quit = true;
+            return true;
+        }
+        else if (guess == 'h')
+        {
+            welcome();
+            clear_cin();
+        }
+        else if (char_to_int(guess) < 0 || char_to_int(guess) > 9)
+        {
+            cout << "Invalid entry: " << char_to_int(guess) << "\nDigits must range from (0-9):\n";
+            clear_cin();
+        }
+        else
+        {
+            cout << "Success.\n";
+            digit = char_to_int(guess);
+            return false;
+        }
+    }
+
+}
+
+void get_guess(vector<int>& guess)
+{
+    // Loop through continously, prompting for a guess and calculating accordingly.
+    // Pre-Condition: A valid vector of ints, passed by reference. 
+    bool quit = false;
+
+    for (int i = 0; i < 4; ++i)
+    {   
+        // Try to get a digit from the user.
+        int digit = 0;
+        quit = try_digit(digit);
+     
+        if (quit)
+        // If they want to quit, simply return at this point.
+        {   
+            cout << "QUIT!";
+            return;
+        }
+
+        // Push back the valid digit into the guess.
+        guess.push_back(digit);
+        cout << "Loading " << digit << "\n";
+    }
+
+}
+
+void bulls_cows(vector<int>& number, vector<int>& guess)
+{
+    // PreCondition, the two vectors of ints passed as reference, the current number, and the users full valid guess.
+    int bulls = 0;
+    int cows = 0;
+
+    for (int i = 0; i < number.size(); ++i)
+    {
+        if (number[i] == guess[i])
+        {   
+            // Check if the immediate corresponding element matches (a bull).
+            ++bulls;
+        }
+        else
+        {
+            for (int j = 0; j < number.size(); ++j)
+            {
+                if (number[i] == guess[j])
+                {
+                    ++cows;
+                }
+            }
+        }
+    } // end for
+
+    cout << "You guessed ";
+    display_number(guess);
+    cout << "\nThat's " << bulls << " bulls and " << cows << " cows!\n";
+}
+
 
 
 
 int main()
 // Implement the bulls and cows game. 
-{   
-    // Variable definitions.
-    int n = 0;
-    vector<int> number;
-    
-    // Load the number which the user must guess.
-    load_game(n, number);
+{
+    try
+    {
+        // Variable definitions.
+        int n = 0;
+        vector<int> number;
+        vector<int> guess;
+
+        // Load the number which the user must guess.
+        load_game(n, number);
+        // Get the users guess;
+        get_guess(guess);
+        bulls_cows(number, guess);
+    }
+    catch (exception e)
+    {
+        cerr << e.what();
+        return 1;
+    }
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
