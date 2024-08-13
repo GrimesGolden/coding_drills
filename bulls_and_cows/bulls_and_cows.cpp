@@ -3,12 +3,12 @@
 
 #include "std_lib_facilities.h"
 
-// Still left to do. When you have the "guess" vector, clear it out before getting the new guess.
+// Bulls and Cow drill implementation for Bjarne Stroustrup PPP. Chapter 4 exercises.
 
 void welcome()
 {
-    // Simply greet the user, and display the rules of bulls and cows.
-    // Enter h at any time to see this again.
+    // Simply greets the user, and display the rules of bulls and cows.
+    // Performs double duty as both welcome message and help prompt. 
     cout << "Welcome to the bulls and cows game.\n";
     cout << "Guess a secret code made up of 4 unique digits. After each guess, you'll receive clues:\n";
     cout << "Bull: A digit is correct and in the correct position.\n";
@@ -19,16 +19,18 @@ void welcome()
 
 void clear_cin()
 {
-    // Clear the cin buffer, in case of error.
+    // Clears the cin buffer, in preperation for new input.
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
 bool validate_seed(int& seed)
 {
-    // Obtain a valid seed.
-    // Pre condition: a double (0).
-    // Post condition: must return a bool, representing if valid input was obtained.
+    // Given a potential seed, verifies if that integer is valid.
+    // Pre condition: an integer passed by reference.
+    // Post condition: must return a bool, representing if a valid seed was recieved.
+    // The valid seed will be passed by reference to the calling function.
+    // The bool represents if this operation was successful.
     int input = 0;
 
     if (cin >> input)
@@ -48,12 +50,14 @@ bool validate_seed(int& seed)
 int return_seed()
 {
     // Prompt the user to enter a valid seed.
-    // Pre-condition: a valid number.
-    // Post-condition: the same valid number.
+    // Pre-condition: none.
+    // Post-condition: a valid integer (n) to be implemented as a seed.
     cout << "\n\nPlease enter any whole number, this will simply load the game with a given seed.\n";
     int n = 0;
     bool valid = false; 
     while (!valid)
+        // The purpose of this loop is to force the user into a continual prompt for valid seed data.
+        // Until valid => Prompt again.
     {
         valid = validate_seed(n);
     }
@@ -63,8 +67,8 @@ int return_seed()
 
 void display_number(vector<int>& number)
 {
-    // Given a pre condition of valid integer array (passed by reference to save memory).
-    // Simply displays the given number using a range for loop.
+    // Given a pre condition of : valid integer array (passed by reference to save memory).
+    // Simply displays the given number using a range for loop (void post condit).
     for (int n : number)
     {
         cout << n;
@@ -73,18 +77,24 @@ void display_number(vector<int>& number)
     cout << "\n";
 }
 
-bool is_digit(int digit)
+bool is_digit(int num)
 {
-    // Self explan
-    if (digit < 0 || digit > 9)
+    // Self explanatory.
+    // Pre condition: A potential digit integer.
+    // Post condition: A bool. True = is_digit
+    if (num < 0 || num > 9)
     {
         return false;
     }
 }
 
-bool is_unique(int digit, vector<int> number)
+bool is_unique(int& digit, vector<int>& number)
 {
-    // verify the given digit is unique in the vector
+    // verify the given int (digit) is unique in the given vector (number).
+    // pre condition: A digit integer, and a number
+
+    // is the number a digit. if not immedietely return false.
+    // if it is, perform further work to determine if its unique.
     for (int n : number)
     {
         if (n == digit)
@@ -93,6 +103,23 @@ bool is_unique(int digit, vector<int> number)
         }
     }
     return true;
+}
+
+bool valid_digit(int& digit, vector<int>& number)
+{
+    if (!is_digit(digit))
+    {
+        return false;
+    }
+
+    else if (!is_unique(digit, number))
+    {
+        return false;
+    }
+    else 
+    {
+        return true;
+    }
 }
 
 int get_digit()
@@ -132,12 +159,11 @@ vector<int> load_number(int& seed)
     {
         int new_digit = get_digit();
 
-        while (!is_unique(new_digit, number))
-            // If this digit is not unique (matches a previous digit).
+        while (!valid_digit(new_digit, number))
+            // If this digit is not valid (matches a previous digit for example).
             // Calculate a new random digit and try again.
-            // It seems statistically rare this would occur, but its an important failsafe. 
         {   
-            cout << "Calculating new seed digit.\n";
+            cout << "Fluctuation in quantum field: Calculating new seed digit.\n";
             new_digit = get_digit();
         }
         number.push_back(new_digit);
