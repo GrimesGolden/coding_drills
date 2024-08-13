@@ -223,7 +223,7 @@ bool process_guess(int& digit)
             // Quit game
         {
             quit = true;
-            return true;
+            //**return true;
         }
         else if (guess == 'h')
             // Print help menu
@@ -245,6 +245,7 @@ bool process_guess(int& digit)
             return false;
         }
     }
+    return true;
 }
 
 bool prompt_guess(vector<int>& guess)
@@ -294,7 +295,7 @@ bool play_again()
     return play;
 }
 
-vector<int> check_score(vector<int>& number, vector<int>& guess)
+bool check_score(vector<int>& number, vector<int>& guess, int& hit, int& miss)
 {
     // PreCondition, the two vectors of ints passed as reference, the current number, and the users full valid guess.
     int bulls = 0;
@@ -324,68 +325,54 @@ vector<int> check_score(vector<int>& number, vector<int>& guess)
     cout << "You guessed ";
     display_number(guess);
     cout << "\nThat's " << bulls << " bulls and " << cows << " cows!\n";
-    score.push_back(bulls);
-    score.push_back(cows);
-    return score;
+    ++miss;
+
+    guess.clear();
+
+    if (bulls == 4)
+    {
+        if (play_again())
+        {  
+            ++hit; 
+            cout << "You solved in " << miss << " guesses.\n";
+            cout << "Playing again! That's " << hit << " wins so far\n";
+            miss = 0;
+            load_game(number);
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return true; 
 }
 
-bool loop_game(vector<int>& number, vector<int>& guess)
+void start_game()
 {   
     // Pre condition: The vector containing a valid number to guess (number) and a vector containing the users guess (guess).
     // post condition, loop_game returns a bool, determining if the user wants to quit.
 
     bool loop = true;
-    vector<int> score;
+    vector<int> number;
+    vector<int> guess;
+    int hit = 0;
+    int miss = 0; 
 
+    welcome();
     load_game(number);
 
     while (loop)
     {   
+        // Loop will become false if the user enters a quit prompt. (Program exit)
         loop = prompt_guess(guess);
+
         if (!loop)
-            // If loop is false, the user wants to quit.
-            // So performing any further logic in this loop will cause problems. 
         {
             continue;
         }
 
-        score = check_score(number, guess);
-        guess.clear();
-
-        if (score[0] == 4)
-        {
-            if (play_again())
-            {
-                load_game(number);
-            } 
-            else
-            {
-                loop = false; 
-            }
-        }
+        loop = check_score(number, guess, hit, miss);
     }// end while
-    return false;
-}
-
-void start_game()
-{
-    // Variable definitions.
-    //***int n = 0;
-    int guesses = 0;
-    int wins = 0;
-    vector<int> number;
-    vector<int> guess;
-
-    bool start = true;
-
-    while (start)
-    {   
-        welcome();
-        // Load the number which the user must guess.
-        //***load_game(n, number);
-        // Get the users guess;
-        start = loop_game(number, guess);
-    }
 }
 
 
@@ -395,18 +382,8 @@ int main()
 {
     try
     {
-        // Variable definitions.
-        /*
-        int n = 0;
-        vector<int> number;
-        vector<int> guess;
-
-        // Load the number which the user must guess.
-        load_game(n, number);
-        // Get the users guess;
-        loop_game(number, guess);
-        */
         start_game();
+        return 0;
     }
     catch (exception e)
     {
