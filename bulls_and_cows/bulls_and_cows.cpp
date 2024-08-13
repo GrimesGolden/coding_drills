@@ -92,8 +92,8 @@ bool is_unique(int& digit, vector<int>& number)
 {
     // verify the given int (digit) is unique in the given vector (number).
     // pre condition: A digit integer, and a number
-
-    // is the number a digit. if not immedietely return false.
+    // post condition: A bool (unique or not)
+    // is the number a digit. if not return false.
     // if it is, perform further work to determine if its unique.
     for (int n : number)
     {
@@ -106,12 +106,16 @@ bool is_unique(int& digit, vector<int>& number)
 }
 
 bool valid_digit(int& digit, vector<int>& number)
-{
+{   
+
+    // Performs two seperate tasks. verifying if the given number is both digit and unique.
+    // Only then can we call an input valid.
+    // pre condition: A digit integer, and a number
+    // post condition: A bool
     if (!is_digit(digit))
     {
         return false;
     }
-
     else if (!is_unique(digit, number))
     {
         return false;
@@ -169,20 +173,21 @@ vector<int> load_number(int& seed)
         number.push_back(new_digit);
     }
 
-    cout << "Number loaded succesfully: ";
+    cout << "Number generated succesfully: ";
     display_number(number);
     return number;
 }
 
-void load_game(int& seed, vector<int>& number)
+void load_game(vector<int>& number)
 {
     // Given the core variables of the game.
     // (That is the users seed and the vector)
     // Load them with the proper data and continue.
 
-    // PreConditions: An integer of any form, and a vector<int> of any valid form.
+    // PreConditions: a vector<int> of any valid form, it will be cleared.
     // No post conditions due to pass by ref.
-    seed = return_seed();
+    int seed = return_seed();
+    number.clear();
     number = load_number(seed);
     cout << "Game loaded succesfully.\n";
 }
@@ -196,10 +201,10 @@ int char_to_int(char c)
     return (int{ c } - '0');
 }
 
-bool try_digit(int& digit)
+bool process_guess(int& digit)
 {
-    // Obtain a valid guess digit.
-    // PreCondition: an int of any form.
+    // Obtain a valid guess from the user.
+    // PreCondition: an int passed by reference, to be processed.
     // Post condition: true or false. True if user entered quit or false to continue.
     bool quit = false;
     char guess = ' ';
@@ -215,44 +220,48 @@ bool try_digit(int& digit)
         cin >> guess;
 
         if (guess == 'q')
+            // Quit game
         {
             quit = true;
             return true;
         }
         else if (guess == 'h')
+            // Print help menu
         {
             welcome();
             clear_cin();
         }
         else if (char_to_int(guess) < 0 || char_to_int(guess) > 9)
+            // Invalid input
         {
             cout << "Invalid entry: " << char_to_int(guess) << "\nDigits must range from (0-9):\n";
             clear_cin();
         }
         else
+            // Valid input. Process guess
         {
             cout << "Success.\n";
             digit = char_to_int(guess);
             return false;
         }
     }
-
 }
-bool loop_guess(vector<int>& guess)
+
+bool prompt_guess(vector<int>& guess)
 {
     // Loop through continously, prompting for a guess and calculating accordingly.
     // Pre-Condition: A valid vector of ints, passed by reference. 
-    // Post-condition: A bool determing whether we should quit main loop. False to quit.
-    bool quit = false;
+    // Post-condition: A bool determing whether we should quit to main loop. False to quit.
+    bool exit = false;
 
     for (int i = 0; i < 4; ++i)
     {   
-        // Try to get a digit from the user.
+        // Obtain a valid digit from the user.
         int digit = 0;
-        quit = try_digit(digit);
+        // Exit will be true if the user requested to quit. 
+        exit = process_guess(digit);
      
-        if (quit)
-        // If they want to quit, simply return at this point.
+        if (exit)
         {   
             cout << "Exiting Game!";
             return false;
@@ -268,7 +277,6 @@ bool loop_guess(vector<int>& guess)
 
 bool play_again()
 {   
-    // Return a char prompted from the user.
     // Post Cond: A bool which determines if the user wants to play again. (true for yes)
     char input = ' ';
     bool play = true;
@@ -323,21 +331,17 @@ vector<int> check_score(vector<int>& number, vector<int>& guess)
 
 bool loop_game(vector<int>& number, vector<int>& guess)
 {   
-    // Change to post condition, loop_game now returns a bool, determining if the user wants to quit.
-  
-    // Pre condition: The vector containing a valid number to guess.
-    // Another vector containing the users now valid guess.
-    // Use these in a loop to determine if the user a) wants to quit. 
-    // b) Has won or c) Should continue making guesses. 
-    // Post condition: a bool determining if the user wants to loop or quit (false to exit).
+    // Pre condition: The vector containing a valid number to guess (number) and a vector containing the users guess (guess).
+    // post condition, loop_game returns a bool, determining if the user wants to quit.
+
     bool loop = true;
     vector<int> score;
-    int seed = 0;
 
-    load_game(seed, number);
+    load_game(number);
+
     while (loop)
     {   
-        loop = loop_guess(guess);
+        loop = prompt_guess(guess);
         if (!loop)
             // If loop is false, the user wants to quit.
             // So performing any further logic in this loop will cause problems. 
@@ -352,7 +356,7 @@ bool loop_game(vector<int>& number, vector<int>& guess)
         {
             if (play_again())
             {
-                load_game(seed, number);
+                load_game(number);
             } 
             else
             {
