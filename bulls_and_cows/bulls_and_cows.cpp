@@ -69,6 +69,7 @@ void display_number(vector<int>& number)
     {
         cout << n;
     }
+
     cout << "\n";
 }
 
@@ -228,7 +229,7 @@ bool get_guess(vector<int>& guess)
         if (quit)
         // If they want to quit, simply return at this point.
         {   
-            cout << "QUIT!";
+            cout << "Exiting Game!";
             return true;
         }
 
@@ -240,11 +241,32 @@ bool get_guess(vector<int>& guess)
 
 }
 
+bool play_again()
+{   
+    // Return a char prompted from the user.
+    // Post Cond: A bool which determines if the user wants to play again. (true for yes)
+    char input = ' ';
+    bool play = true;
+
+    clear_cin();
+    cout << "Press any key to play again, or q to quit. h for help.\n";
+    cin >> input;
+    clear_cin();
+
+    if (input == 'q')
+    {
+        play = false;
+    }
+
+    return play;
+}
+
 vector<int> check_score(vector<int>& number, vector<int>& guess)
 {
     // PreCondition, the two vectors of ints passed as reference, the current number, and the users full valid guess.
     int bulls = 0;
     int cows = 0;
+
     vector<int> score;
 
     for (int i = 0; i < number.size(); ++i)
@@ -287,16 +309,43 @@ void loop_game(vector<int>& number, vector<int>& guess)
     {   
         // Get the guess, and also determine if we should quit.
         quit = get_guess(guess);
+
+        if (quit) 
+        {   
+            // If the user chose to quit, there is no need to check the score.
+            break; 
+        }
+
         score = check_score(number, guess);
 
         if (score[0] == 4)
-        {
-            cout << "YOU WON!\n";
-            quit = true; 
+        {   
+            if (!play_again())
+            {
+                quit = true;
+                break;
+            }
+            else
+            {
+                cout << "You Won!\n";
+            }
         }
 
         guess.clear(); // try to clear the vector here
     }
+}
+
+void start_game()
+{
+    // Variable definitions.
+    int n = 0;
+    vector<int> number;
+    vector<int> guess;
+
+    // Load the number which the user must guess.
+    load_game(n, number);
+    // Get the users guess;
+    loop_game(number, guess);
 }
 
 
