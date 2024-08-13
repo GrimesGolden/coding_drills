@@ -347,6 +347,15 @@ bool check_score(vector<int>& number, vector<int>& guess, int& hit, int& miss)
     return true; 
 }
 
+void process_win(int& hit, int& miss, vector<int> number)
+{
+    ++hit;
+    cout << "You solved in " << miss << " guesses.\n";
+    cout << "Playing again! That's " << hit << " wins so far\n";
+    miss = 0;
+    load_game(number);
+}
+
 void start_game()
 {   
     // Pre condition: The vector containing a valid number to guess (number) and a vector containing the users guess (guess).
