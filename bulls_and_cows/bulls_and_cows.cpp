@@ -3,6 +3,8 @@
 
 #include "std_lib_facilities.h"
 
+// Still left to do. When you have the "guess" vector, clear it out before getting the new guess.
+
 void welcome()
 {
     // Simply greet the user, and display the rules of bulls and cows.
@@ -121,7 +123,6 @@ vector<int> load_number(int& seed)
 
     // Load the first int.
     int first = get_digit();
-    cout << "First number " << first << "\n";
     number.push_back(first);
 
     // Loop through the remaining 3 digits.
@@ -138,11 +139,10 @@ vector<int> load_number(int& seed)
             cout << "Calculating new seed digit.\n";
             new_digit = get_digit();
         }
-        cout << "Pushing back digit " << new_digit << "\n";
         number.push_back(new_digit);
     }
 
-    cout << "Number obtained succesfully: ";
+    cout << "Number loaded succesfully: ";
     display_number(number);
     return number;
 }
@@ -212,11 +212,11 @@ bool try_digit(int& digit)
     }
 
 }
-
-void get_guess(vector<int>& guess)
+bool get_guess(vector<int>& guess)
 {
     // Loop through continously, prompting for a guess and calculating accordingly.
     // Pre-Condition: A valid vector of ints, passed by reference. 
+    // Post-condition: A bool determing whether we should quit main loop. True to quit.
     bool quit = false;
 
     for (int i = 0; i < 4; ++i)
@@ -229,21 +229,23 @@ void get_guess(vector<int>& guess)
         // If they want to quit, simply return at this point.
         {   
             cout << "QUIT!";
-            return;
+            return true;
         }
 
         // Push back the valid digit into the guess.
         guess.push_back(digit);
         cout << "Loading " << digit << "\n";
     }
+    return false;
 
 }
 
-void bulls_cows(vector<int>& number, vector<int>& guess)
+vector<int> check_score(vector<int>& number, vector<int>& guess)
 {
     // PreCondition, the two vectors of ints passed as reference, the current number, and the users full valid guess.
     int bulls = 0;
     int cows = 0;
+    vector<int> score;
 
     for (int i = 0; i < number.size(); ++i)
     {
@@ -267,8 +269,35 @@ void bulls_cows(vector<int>& number, vector<int>& guess)
     cout << "You guessed ";
     display_number(guess);
     cout << "\nThat's " << bulls << " bulls and " << cows << " cows!\n";
+    score.push_back(bulls);
+    score.push_back(cows);
+    return score;
 }
 
+void loop_game(vector<int>& number, vector<int>& guess)
+{   
+    // Pre condition: The vector containing a valid number to guess.
+    // Another vector containing the users now valid guess.
+    // Use these in a loop to determine if the user a) wants to quit. 
+    // b) Has won or c) Should continue making guesses. 
+    bool quit = false;
+    vector<int> score;
+
+    while (!quit)
+    {   
+        // Get the guess, and also determine if we should quit.
+        quit = get_guess(guess);
+        score = check_score(number, guess);
+
+        if (score[0] == 4)
+        {
+            cout << "YOU WON!\n";
+            quit = true; 
+        }
+
+        guess.clear(); // try to clear the vector here
+    }
+}
 
 
 
@@ -285,8 +314,7 @@ int main()
         // Load the number which the user must guess.
         load_game(n, number);
         // Get the users guess;
-        get_guess(guess);
-        bulls_cows(number, guess);
+        loop_game(number, guess);
     }
     catch (exception e)
     {
