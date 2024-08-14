@@ -28,7 +28,7 @@ void clear_console()
 
 void clear_cin()
 {
-    // Clears the cin buffer, in preperation for new input.
+    // Clears the cin buffer, useful in preparation for new input.
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
@@ -36,10 +36,8 @@ void clear_cin()
 bool validate_seed(int& seed)
 {
     // Given a potential seed, verifies if that integer is valid.
-    // Pre condition: an integer passed by reference.
-    // Post condition: must return a bool, representing if a valid seed was recieved.
-    // The valid seed will be passed by reference to the calling function.
-    // The bool represents if this operation was successful.
+    // Pre-Condition: An integer representing the potential seed.
+    // Post-Condition: a bool: Specifying if the seed is valid (t). 
     int input = 0;
 
     if (cin >> input)
@@ -58,26 +56,32 @@ bool validate_seed(int& seed)
 
 int return_seed()
 {
-    // Prompt the user to enter a valid seed.
+    // Prompt the user to enter a valid seed. Obtains that seed
     // Pre-condition: none.
     // Post-condition: a valid integer (n) to be implemented as a seed.
+
     cout << "\n\nPlease enter any whole number, this will simply load the game with a given seed.\n";
-    int n = 0;
+    int seed = 0;
     bool valid = false; 
+
     while (!valid)
         // The purpose of this loop is to force the user into a continual prompt for valid seed data.
         // Until valid => Prompt again.
     {
-        valid = validate_seed(n);
+        valid = validate_seed(seed);
     }
-    cout << "Seed obtained " << n << "\n";
-    return n;
+
+    cout << "Seed obtained " << seed << "\n";
+    return seed;
 }
 
 void display_number(vector<int>& number)
 {
     // Given a pre condition of : valid integer array (passed by reference to save memory).
     // Simply displays the given number using a range for loop (void post condit).
+
+    // Useful for quickly printing the vector digits in number form. 
+
     for (int n : number)
     {
         cout << n;
@@ -105,12 +109,13 @@ bool is_unique(int& digit, vector<int>& number)
 {
     // verify the given int (digit) is unique in the given vector (number).
     // pre condition: A digit integer, and a number
-    // post condition: A bool (unique or not)
-    // is the number a digit. if not return false.
-    // if it is, perform further work to determine if its unique.
+    // post condition: A bool (t == unique)
+
+
     for (int n : number)
     {
         if (n == digit)
+            // If any number in the given vector matches the digit, its not unique.
         {
             return false;
         }
@@ -123,8 +128,12 @@ bool valid_digit(int& digit, vector<int>& number)
 
     // Performs two seperate tasks. verifying if the given number is both digit and unique.
     // Only then can we call an input valid.
+ 
     // pre condition: A digit integer, and a number
     // post condition: A bool
+
+    // A rather redundant safety check, one could say.
+
     if (!is_digit(digit))
     {
         return false;
@@ -143,6 +152,7 @@ int get_digit()
 {   
     // Continuously repeats randint(10)
     // Until a valid digit is obtained.
+
     int digit = randint(10);
     while (!is_digit(digit))
     {
@@ -186,18 +196,19 @@ vector<int> load_number(int& seed)
         number.push_back(new_digit);
     }
 
-    cout << "Number generated succesfully ";
-    //display_number(number); uncomment to help with bug detection, or game modification.
+    cout << "Number generated succesfully\n";
+    // DEBUG 
+    //display_number(number); //uncomment to help with bug detection, or game modification.
     return number;
 }
 
 void load_game(vector<int>& number)
 {
-    // Given the core variables of the game.
-    // (That is the users seed and the vector)
-    // Load them with the proper data and continue.
+    // Obtain a seed using return_seed()
+    // Use this to load the number to be guessed into the vector. 
+    // In essence preparing the game for a new round of play. 
 
-    // PreConditions: a vector<int> of any valid form, it will be cleared.
+    // PreConditions: a vector<int> of any valid form, contents irrelevant.
     // No post conditions due to pass by ref.
     int seed = return_seed();
     number.clear();
@@ -216,17 +227,22 @@ int char_to_int(char c)
 }
 
 bool validate_guess(int& digit)
-{
-    // Obtain a valid guess from the user
+{   
+    //pre-condition: An integer digit. 
+    // post-condition: A bool representing a valid guess (t). Return false for quit request.
+    // Obtain a valid guess from the user.
+
     char guess = ' ';
 
     clear_cin();
   
     while (true)
     {
-        // if its a digit 0-9 its valid.
-       // if its q or quit its quit.
-       // if its h display help.
+        // any digit 0-9 is valid.
+       // q or quit == quit.
+       // h == display help.
+        // All other characters prompt invalid entry. 
+
         cout << "Enter digit to guess\n";
         cin >> guess;
 
@@ -242,17 +258,18 @@ bool validate_guess(int& digit)
             clear_cin();
             continue;
         }
-        else if (char_to_int(guess) < 0 || char_to_int(guess) > 9)
+        else if (!is_digit(char_to_int(guess))) // This rather messy statement simply confirms or rejects that the users guess is a digit. 
             // Invalid input
-        {
-            cout << "Invalid entry: " << char_to_int(guess) << "\nDigits must range from (0-9):\n";
+        {   
+            cout << "\n\n\n\n";
+            cout << "Invalid entry.\nDigits must range from (0-9):\n";
             clear_cin();
             continue;
         }
         else
             // Valid input. Process guess
         {
-            cout << "Success.\n";
+            cout << "Success.\n\n\n";
             digit = char_to_int(guess);
             return true;
         }
@@ -260,12 +277,14 @@ bool validate_guess(int& digit)
 }
 
 
-bool get_guess(int& digit, vector<int>& guess)
+bool get_guess(vector<int>& guess)
 {
     // Loop through continously, prompting for a guess and calculating accordingly.
-    // Pre-Condition: A valid vector of ints, passed by reference.
+    // Pre-Condition: A valid vector of ints, passed by reference(The users potential guess). And a digit
     // Post-condition: A bool determing whether we should quit to main loop. true to quit.
     //bool  = false;
+
+    // Performs the critical step of obtaining a full and valid guess from the user. Ending a round of gameplay.
     bool loop = true;
 
     for (int i = 0; i < 4; ++i)
@@ -276,7 +295,6 @@ bool get_guess(int& digit, vector<int>& guess)
 
         if (!validate_guess(digit))
         {
-            cout << "Exiting Game!";
             return true;
         }
         else
@@ -291,6 +309,7 @@ bool get_guess(int& digit, vector<int>& guess)
 
 bool play_again(vector<int>& number)
 {   
+    // Pre:condition: The number itself passed by ref (important so we can load a new number)
     // Post Cond: A bool which determines if the user wants to play again. (true for yes)
     char input = ' ';
 
@@ -305,7 +324,8 @@ bool play_again(vector<int>& number)
         cout << "Exiting game!\n";
     }
     else 
-    {
+    {   
+        // In this junction, the game loop continues, but a new number must be created from which to guess.
         load_game(number);
         return false;
     }
@@ -314,6 +334,8 @@ bool play_again(vector<int>& number)
 bool get_score(vector<int>& number, vector<int>& guess)
 {
     // Return true if the user won, and false if they did not guess correctly.
+    // pre condition: The number to be guessed, and the guess itself. Both valid and passed by ref.
+    // Post condition: A bool (t == win) (f == incorrect guess)
     int bulls = 0;
     int cows = 0;
     int tries = 0;
@@ -321,6 +343,7 @@ bool get_score(vector<int>& number, vector<int>& guess)
 
     vector<int> score;
 
+    // Determine bulls and cows.
     for (int i = 0; i < number.size(); ++i)
     {
         if (number[i] == guess[i])
@@ -340,11 +363,12 @@ bool get_score(vector<int>& number, vector<int>& guess)
         }
     } // end for
 
+    // Display info.
     clear_console();
     cout << "You guessed ";
     display_number(guess);
-    //cout << "\nThat's " << bulls << " bulls and " << cows << " cows!\n";
     guess.clear(); // Reset the users guess, to prevent guesses stacking in vector.
+    // Determine win condition. 
     if (bulls == 4)
     {
         return true;
@@ -360,9 +384,10 @@ bool get_score(vector<int>& number, vector<int>& guess)
 
 void start_game()
 {   
-    // Pre condition: The vector containing a valid number to guess (number) and a vector containing the users guess (guess).
-    // post condition, loop_game returns a bool, determining if the user wants to quit.
+    // No Pre or post condition. This loop is entirely self contained.
+    // Useful for later additions, or use in other programs. 
 
+    // Create variables. 
     bool quit = false;
     bool win = false;
 
@@ -371,14 +396,16 @@ void start_game()
     int tries = 0;
     int bulls = 0;
     int win_count = 0;
-    int digit = 0;
+
+    // Setup first round.
     welcome();
     load_game(number);
 
 
+    // Begin main loop
     while (!quit)
     {   
-        quit = get_guess(digit, guess);
+        quit = get_guess(guess);
 
         if (quit)
         {
@@ -403,17 +430,18 @@ void start_game()
             cout << "Try again...\n";
         }
     }// end while
+    cout << "Exiting.";
 }
 
 
 
 int main()
 // Implement the bulls and cows game. 
+// We give thanks to the overlord Bjarne Stroustrup.
 {
     try
     {
         start_game();
-        cout << "Exiting.";
         return 0;
     }
     catch (exception e)
@@ -422,14 +450,3 @@ int main()
         return 1;
     }
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
