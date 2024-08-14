@@ -9,12 +9,21 @@ void welcome()
 {
     // Simply greets the user, and display the rules of bulls and cows.
     // Performs double duty as both welcome message and help prompt. 
-    cout << "Welcome to the bulls and cows game.\n";
+    cout << "Welcome to the bulls and cows game.\n\n";
     cout << "Guess a secret code made up of 4 unique digits. After each guess, you'll receive clues:\n";
     cout << "Bull: A digit is correct and in the correct position.\n";
     cout << "Cow: A digit is correct but in the wrong position\n";
     cout << "Guess all four to win! Good luck.\n";
     cout << "Enter h or 'help' during gameplay to see this message again.\n";
+    cout << "\n\n\n\n";
+}
+
+void clear_console()
+{
+    // Simulates clearing the console.
+    for (int i = 0; i < 100; ++i) {
+        std::cout << std::endl;
+    }
 }
 
 void clear_cin()
@@ -85,6 +94,10 @@ bool is_digit(int num)
     if (num < 0 || num > 9)
     {
         return false;
+    }
+    else
+    {
+        return true;
     }
 }
 
@@ -173,8 +186,8 @@ vector<int> load_number(int& seed)
         number.push_back(new_digit);
     }
 
-    cout << "Number generated succesfully: ";
-    display_number(number);
+    cout << "Number generated succesfully ";
+    //display_number(number); uncomment to help with bug detection, or game modification.
     return number;
 }
 
@@ -190,6 +203,7 @@ void load_game(vector<int>& number)
     number.clear();
     number = load_number(seed);
     cout << "Game loaded succesfully.\n";
+    cout << "\n\n\n\n";
 }
 
 int char_to_int(char c)
@@ -201,17 +215,14 @@ int char_to_int(char c)
     return (int{ c } - '0');
 }
 
-bool process_guess(int& digit)
+bool validate_guess(int& digit)
 {
-    // Obtain a valid guess from the user.
-    // PreCondition: an int passed by reference, to be processed.
-    // Post condition: true or false. True if user entered quit or false to continue.
-    bool quit = false;
+    // Obtain a valid guess from the user
     char guess = ' ';
 
     clear_cin();
-
-    while (!quit)
+  
+    while (true)
     {
         // if its a digit 0-9 its valid.
        // if its q or quit its quit.
@@ -221,92 +232,99 @@ bool process_guess(int& digit)
 
         if (guess == 'q')
             // Quit game
-        {
-            quit = true;
-            //**return true;
+        {   
+            return false;
         }
         else if (guess == 'h')
             // Print help menu
         {
             welcome();
             clear_cin();
+            continue;
         }
         else if (char_to_int(guess) < 0 || char_to_int(guess) > 9)
             // Invalid input
         {
             cout << "Invalid entry: " << char_to_int(guess) << "\nDigits must range from (0-9):\n";
             clear_cin();
+            continue;
         }
         else
             // Valid input. Process guess
         {
             cout << "Success.\n";
             digit = char_to_int(guess);
-            return false;
+            return true;
         }
     }
-    return true;
 }
 
-bool prompt_guess(vector<int>& guess)
+
+bool get_guess(int& digit, vector<int>& guess)
 {
     // Loop through continously, prompting for a guess and calculating accordingly.
-    // Pre-Condition: A valid vector of ints, passed by reference. 
-    // Post-condition: A bool determing whether we should quit to main loop. False to quit.
-    bool exit = false;
+    // Pre-Condition: A valid vector of ints, passed by reference.
+    // Post-condition: A bool determing whether we should quit to main loop. true to quit.
+    //bool  = false;
+    bool loop = true;
 
     for (int i = 0; i < 4; ++i)
-    {   
+    {
         // Obtain a valid digit from the user.
         int digit = 0;
-        // Exit will be true if the user requested to quit. 
-        exit = process_guess(digit);
-     
-        if (exit)
-        {   
+        // Exit will be true if the user requested to quit.
+
+        if (!validate_guess(digit))
+        {
             cout << "Exiting Game!";
-            return false;
+            return true;
         }
-
-        // Push back the valid digit into the guess.
-        guess.push_back(digit);
-        cout << "Loading " << digit << "\n";
+        else
+        {
+            // Push back the valid digit into the guess.
+            guess.push_back(digit);
+            cout << "Loading " << digit << "\n";
+        }
     }
-    return true;
-
+    return false; 
 }
 
-bool play_again()
+bool play_again(vector<int>& number)
 {   
     // Post Cond: A bool which determines if the user wants to play again. (true for yes)
     char input = ' ';
-    bool play = true;
 
     clear_cin();
-    cout << "You Won!\nPress any key to play again, or q to quit.\n";
+    cout << "\nPress any key to play again, or q to quit.\n";
     cin >> input;
     clear_cin();
 
     if (input == 'q')
     {
-        play = false;
+        return true;
         cout << "Exiting game!\n";
     }
-    return play;
+    else 
+    {
+        load_game(number);
+        return false;
+    }
 }
 
-bool check_score(vector<int>& number, vector<int>& guess, int& hit, int& miss)
+bool get_score(vector<int>& number, vector<int>& guess)
 {
-    // PreCondition, the two vectors of ints passed as reference, the current number, and the users full valid guess.
+    // Return true if the user won, and false if they did not guess correctly.
     int bulls = 0;
     int cows = 0;
+    int tries = 0;
+    int wins = 0;
 
     vector<int> score;
 
     for (int i = 0; i < number.size(); ++i)
     {
         if (number[i] == guess[i])
-        {   
+        {
             // Check if the immediate corresponding element matches (a bull).
             ++bulls;
         }
@@ -322,65 +340,68 @@ bool check_score(vector<int>& number, vector<int>& guess, int& hit, int& miss)
         }
     } // end for
 
+    clear_console();
     cout << "You guessed ";
     display_number(guess);
-    cout << "\nThat's " << bulls << " bulls and " << cows << " cows!\n";
-    ++miss;
-
-    guess.clear();
-
+    //cout << "\nThat's " << bulls << " bulls and " << cows << " cows!\n";
+    guess.clear(); // Reset the users guess, to prevent guesses stacking in vector.
     if (bulls == 4)
     {
-        if (play_again())
-        {  
-            ++hit; 
-            cout << "You solved in " << miss << " guesses.\n";
-            cout << "Playing again! That's " << hit << " wins so far\n";
-            miss = 0;
-            load_game(number);
-        }
-        else
-        {
-            return false;
-        }
+        return true;
     }
-    return true; 
+    else
+    {   
+        cout << "\nThat's " << bulls << " bulls and " << cows << " cows!\n";
+        return false; 
+    }
 }
 
-void process_win(int& hit, int& miss, vector<int> number)
-{
-    ++hit;
-    cout << "You solved in " << miss << " guesses.\n";
-    cout << "Playing again! That's " << hit << " wins so far\n";
-    miss = 0;
-    load_game(number);
-}
+
 
 void start_game()
 {   
     // Pre condition: The vector containing a valid number to guess (number) and a vector containing the users guess (guess).
     // post condition, loop_game returns a bool, determining if the user wants to quit.
 
-    bool loop = true;
+    bool quit = false;
+    bool win = false;
+
     vector<int> number;
     vector<int> guess;
-    int hit = 0;
-    int miss = 0; 
-
+    int tries = 0;
+    int bulls = 0;
+    int win_count = 0;
+    int digit = 0;
     welcome();
     load_game(number);
 
-    while (loop)
-    {   
-        // Loop will become false if the user enters a quit prompt. (Program exit)
-        loop = prompt_guess(guess);
 
-        if (!loop)
+    while (!quit)
+    {   
+        quit = get_guess(digit, guess);
+
+        if (quit)
         {
             continue;
         }
 
-        loop = check_score(number, guess, hit, miss);
+        win = get_score(number, guess);
+        ++tries;
+
+        if (win)
+        {   
+            ++win_count;
+            cout << "And you won!\n You guessed the number ";
+            display_number(number);
+            cout << "\nYou won in " << tries << " guesses.\n";
+            cout << win_count << " wins so far this game.\n";
+            quit = play_again(number);
+            tries = 0; 
+        }
+        else
+        {
+            cout << "Try again...\n";
+        }
     }// end while
 }
 
@@ -392,6 +413,7 @@ int main()
     try
     {
         start_game();
+        cout << "Exiting.";
         return 0;
     }
     catch (exception e)
