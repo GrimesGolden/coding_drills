@@ -6,20 +6,30 @@
 class Token {
 public:
     char kind; // what kind of token.
-    double value; // for numbers, what type of value.
+    int value; // for numbers, what type of value.
 };
 
 void get_value(vector<Token>& tokens, int value)
 {
     Token t{ '8', value };
-    cout << "Pushing back token" << value << "\n";
+    cout << "Pushing back value token" << value << "\n";
     tokens.push_back(t);
 }
+
+void insert_value(vector<Token>& tokens, int value, int index)
+{
+    Token t{ '8', value };
+    cout << "Inserting value token" << value << "\n";
+    //  myVector.insert(myVector.begin() + indexToInsert, valueToInsert);
+    tokens.insert(tokens.begin() + (index), t);
+}
+
+
 
 void get_operand(vector<Token>& tokens, char value)
 {
     Token t{ value };
-    cout << "Pushing back token" << value << "\n";
+    cout << "Pushing back operand token" << value << "\n";
     tokens.push_back(t);
 
 }
@@ -29,16 +39,16 @@ int calculate(char op, int lval, int rval)
     switch (op)
     {
     case '+':
-        return (lval += rval);
+        return (lval + rval);
         break;
     case '-':
-        return (lval -= rval);
+        return (lval - rval);
         break;
     case '*':
-        return (lval *= rval);
+        return (lval * rval);
         break;
     case '/':
-        return (lval /= rval);
+        return (lval / rval);
         break;
     default:
         cout << "Error, " << op << " is not an operand";
@@ -55,26 +65,27 @@ void process_operand(vector<Token>& tokens, char op)
         if (tokens[i].kind == op)
         {   
             // DEBUG
-            cout << "This worked. With " << tokens[i].kind << " \n";
+            int index = i;
+            cout << "This worked. With " << tokens[index].kind << " \n";
             cout << "LVAL worked: ";
-            int lval = tokens[i - 1].value;
+            int lval = tokens[index - 1].value;
             cout << lval << "\n";
             cout << "RVAL worked: ";
-            int rval = tokens[i + 1].value;
+            int rval = tokens[index + 1].value;
             cout << rval << "\n";
 
             int result = calculate(op, lval, rval);
             cout << "Result: " << result << " worked.\n";
             // confused yet?
-            tokens.erase(tokens.begin() + i - 1, tokens.begin() + i + 2);
+            tokens.erase(tokens.begin() + index - 1, tokens.begin() + index + 2);
 
 
             // myVector.erase(myVector.begin() + indexToRemove - 1, myVector.begin() + indexToRemove + 2);
            // tokens.erase(tokens.begin() + i + 1);
             //tokens.erase(tokens.begin() + i);
 
-            get_value(tokens, result);
-            cout << "Pushing back " << result << "\n";
+            insert_value(tokens, result, (index - 1));
+            cout << "Inserting " << result << "\n";
         }
     }
 }
