@@ -21,7 +21,6 @@ string to_lower(string word)
     {
         copy[0] = tolower(copy[0]);
     }
-
     return copy;
 }
 
@@ -45,7 +44,7 @@ bool valid_string(string& date)
 }
 
 
-bool check_quit(vector<string>& dates)
+bool check_quit(vector<string> dates) 
 {   
     // Verify that the user has entered a quit request.
     // pre condition: A valid string copy (we dont want to change potential input).
@@ -71,16 +70,19 @@ void reject_value(int& rejected)
 
 }
 
-string reduce_day(string& day)
+string format_day(string day)
 {   
     // Reduce the given day of the week to 3.
     // Pre-Condition: A string that is greater than 3.
     // Post Cond: The string itself; 
-    string reduced = "";
+
+    string reduced = day;
 
     if (day.size() > 3)
-    {
-        //reduce
+    {   
+        // Clear the given string.
+        reduced = "";
+
         for (int i = 0; i < 3; ++i)
         {
             reduced += day[i];
@@ -105,7 +107,7 @@ bool last_value(string& search, vector<string>& dates, int index)
 
     for (int i = (index + 1); i < dates.size(); ++i)
     {
-        if (reduce_day(dates[i]) == search)
+        if (format_day(dates[i]) == search)
         {
             last = false;
         }
@@ -114,27 +116,27 @@ bool last_value(string& search, vector<string>& dates, int index)
     return last;
 }
 
-void print_values(string& day, vector<string>& dates, vector<int>& values)
+void print_values(string day, vector<string>& dates, vector<int>& values)
 // For the given string (day) searches through the dates and finds each value it matches with.
 // For that value, print it to the console. Thereby displaying the given values.
 // Pre condition: A string to search for matches, the vector of user entered days, the vector of user entered values. 
 // Post condition: None, prints to the console only.
 {   
     // Return all the values entered for the given day. 
-    string search = reduce_day(day);
+    string search = format_day(day);
     bool value_found = false;
 
     for (int i = 0; i < dates.size(); ++i)
     {
-        if (search == reduce_day(dates[i]))
+        if (search == format_day(dates[i]))
             // If a day matches the given search value.
         {
-            cout << values[i];
-
-            if (!last_value(search, dates, i))
-            {
-                cout << ", ";
-            }
+            cout << values[i] << ", ";
+            //DEBUG
+            //if (!last_value(search, dates, i))
+            //{
+            //    cout << ", ";
+          //  }
 
             value_found = true;
         }
@@ -148,7 +150,6 @@ void print_values(string& day, vector<string>& dates, vector<int>& values)
 }
 
 void compute_results(vector<string>& dates, vector<int>& values)
-// NEEDS COMMENTS
 {   
     
     vector<string> days = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
