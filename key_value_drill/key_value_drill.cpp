@@ -131,12 +131,12 @@ void print_values(string day, vector<string>& dates, vector<int>& values)
         if (search == format_day(dates[i]))
             // If a day matches the given search value.
         {
-            cout << values[i] << ", ";
+            cout << values[i];
             //DEBUG
-            //if (!last_value(search, dates, i))
-            //{
-            //    cout << ", ";
-          //  }
+            if (!last_value(search, dates, i))
+            {
+                cout << ", ";
+            }
 
             value_found = true;
         }
