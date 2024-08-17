@@ -61,33 +61,39 @@ int calculate(char op, int lval, int rval)
 void process_operand(vector<Token>& tokens, char op)
 {
     for (int i = 0; i < tokens.size(); ++i)
-    {
+    {   
+        cout << "The size of tokens right now is: " << tokens.size();
         if (tokens[i].kind == op)
         {   
             // DEBUG
-            int index = i;
-            cout << "This worked. With " << tokens[index].kind << " \n";
+            cout << "This worked. With " << tokens[i].kind << " \n";
             cout << "LVAL worked: ";
-            int lval = tokens[index - 1].value;
+            int lval = tokens[i - 1].value;
             cout << lval << "\n";
             cout << "RVAL worked: ";
-            int rval = tokens[index + 1].value;
+            int rval = tokens[i + 1].value;
             cout << rval << "\n";
 
             int result = calculate(op, lval, rval);
             cout << "Result: " << result << " worked.\n";
             // confused yet?
-            tokens.erase(tokens.begin() + index - 1, tokens.begin() + index + 2);
+
+            Token t = { '8', result };
+            tokens[i + 1] = t;
+            // myVector.begin() + (indexToKeep - 2), myVector.begin() + indexToKeep
+            tokens.erase(tokens.begin() + i - 1, tokens.begin() + 1 + i); // DEBUG THIS LINE
 
 
             // myVector.erase(myVector.begin() + indexToRemove - 1, myVector.begin() + indexToRemove + 2);
            // tokens.erase(tokens.begin() + i + 1);
             //tokens.erase(tokens.begin() + i);
 
-            insert_value(tokens, result, (index - 1));
+            //insert_value(tokens, result, (index - 1));
             cout << "Inserting " << result << "\n";
+            --i;
         }
     }
+    cout << "Broke the loop in process_operand\n";
 }
 
 void process_tokens(vector<Token>& tokens)
