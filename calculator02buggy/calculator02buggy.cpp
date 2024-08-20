@@ -187,6 +187,35 @@ double expression()
     }
 }
 
+int factorial(int input)
+{
+    // Working factorial function.
+    // Pre Condition: Must take an integer between 0 and 16.
+    // Post Condition: An integer value. 
+    if (input == 0 || input == 1)
+    {
+        return 1;
+    }
+    else if (input < 0)
+    {
+        error("negative factorial detected.");
+    }
+    else if (input >= 17)
+    {
+        error("factorial is too large (max is 16!)");
+    }
+    else
+    {
+        int result = input;
+        while (input > 1)
+        {
+            result *= (input - 1);
+            --input;
+        }
+        return result;
+    }
+}
+
 //------------------------------------------------------------------------------
 
 int main()
