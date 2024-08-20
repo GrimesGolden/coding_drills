@@ -74,8 +74,8 @@ Token Token_stream::get()
     cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
 
     switch (ch) {
-    case ';':    // for "print"
-    case 'q':    // for "quit"
+    case '=':    // for "print"
+    case 'x':    // for "quit"
     case '(': case ')': case '+': case '-': case '*': case '/':
         return Token(ch);        // let each character represent itself
     case '.':
@@ -181,12 +181,15 @@ double expression()
 int main()
 try
 {   
+    cout << "Welcome to our simple calculator.\nPlease enter expression using floating point numbers.\n";
+    cout << "Operators available are *, +, / and -\nTo print result enter =\nTo exit enter 'x'\n>>";
+
     double val = 0;
     while (cin) {
         Token t = ts.get();
-        if (t.kind == 'q') 
+        if (t.kind == 'x') 
             break; // 'q' for quit
-        if (t.kind == ';')        // ';' for "print now"
+        if (t.kind == '=')        // ';' for "print now"
             cout << "=" << val << '\n';
         else {
             ts.putback(t);
