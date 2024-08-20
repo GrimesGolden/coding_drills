@@ -76,7 +76,7 @@ Token Token_stream::get()
     switch (ch) {
     case '=':    // for "print"
     case 'x':    // for "quit"
-    case '{': case '}': case '(': case ')': case '+': case '-': case '*': case '/':
+    case '{': case '}': case '(': case ')': case '!': case '+': case '-': case '*': case '/':
         return Token(ch);        // let each character represent itself
     case '.':
     case '0': case '1': case '2': case '3': case '4':
@@ -104,6 +104,35 @@ double expression();    // declaration so that primary() can call expression()
 //------------------------------------------------------------------------------
 
 // deal with numbers and parentheses
+int factorial(int input)
+{
+    // Working factorial function.
+    // Pre Condition: Must take an integer between 0 and 16.
+    // Post Condition: An integer value. 
+    if (input == 0 || input == 1)
+    {
+        return 1;
+    }
+    else if (input < 0)
+    {
+        error("negative factorial detected.");
+    }
+    else if (input >= 17)
+    {
+        error("factorial is too large (max is 16!)");
+    }
+    else
+    {
+        int result = input;
+        while (input > 1)
+        {
+            result *= (input - 1);
+            --input;
+        }
+        return result;
+    }
+}
+
 double primary()
 {
     Token t = ts.get();
@@ -126,8 +155,25 @@ double primary()
         }
         return d;
     }
-    case '8':            // we use '8' to represent a number
-        return t.value;  // return the number's value 
+    case '8':
+    {
+        // we use '8' to represent a number
+        // We need to look at the next token (to see if its factorial).
+        Token next = ts.get();
+        if (next.kind != '!')
+        {
+            // If not just put it back and perform the standard primary() tasks.
+            ts.putback(next);
+            return t.value; // return the numbers value
+        }
+        else if (next.kind == '!')
+        {
+            // In this case we must perform factorial task. 
+            int f = t.value; // create an integer from the doubles value
+            f = factorial(f); // and use it in the factorial function.
+            return f; // return this value, and no not putback the '!' token (it has been used up here)
+        }
+    }
     default:
         error("primary expected");
     }
@@ -184,35 +230,6 @@ double expression()
             ts.putback(t);     // put t back into the token stream
             return left;       // finally: no more + or -: return the answer
         }
-    }
-}
-
-int factorial(int input)
-{
-    // Working factorial function.
-    // Pre Condition: Must take an integer between 0 and 16.
-    // Post Condition: An integer value. 
-    if (input == 0 || input == 1)
-    {
-        return 1;
-    }
-    else if (input < 0)
-    {
-        error("negative factorial detected.");
-    }
-    else if (input >= 17)
-    {
-        error("factorial is too large (max is 16!)");
-    }
-    else
-    {
-        int result = input;
-        while (input > 1)
-        {
-            result *= (input - 1);
-            --input;
-        }
-        return result;
     }
 }
 
