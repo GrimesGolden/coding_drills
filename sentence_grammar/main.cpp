@@ -7,21 +7,33 @@ int main()
 // Step One, make a program that can detect if input is a noun.
 {   
     string input = "";
+
     
-
-    while (input != ".")
+    try
     {
-        cin >> input;
+        while (input != ".")
+        {
+            cin >> input;
 
-        if (noun(input)) {
-            cout << input << " is a noun.\n";
+            strip_input(input);
+
+            if (input == ".") {
+                continue;
+            } else if (noun(input)) {
+                cout << input << " is a noun.\n";
+            }
+            else if (!noun(input)) {
+                cout << input << " is NOT A noun.\n";
+            }
+            else {
+                cout << input << " is invalid.\n";
+            }
         }
-        else if (!noun(input)) {
-            cout << input << " is NOT A noun.\n";
-        }
-        else {
-            cout << input << " is invalid.\n";
-        }
+    }
+    catch (const std::exception& e) 
+    {
+        // Catch and print exceptions derived from std::exception
+        cerr << "Exception caught: " << e.what() << std::endl;
     }
 }
 
