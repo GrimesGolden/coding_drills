@@ -7,6 +7,8 @@ void strip_input(string& input)
     // In the event the strings last element is a '.':
     // This function will put a copy of the '.' back into the cin buffer 
     // then pop_back this element, effectively destroying it. 
+
+
     if (input.size() > 1) // This is important, because "." is not to be stripped. 
     {
         int last_index = input.size() - 1;
@@ -22,12 +24,25 @@ void strip_input(string& input)
     }
 }
 
-bool noun(string input)
-{   // Given a valid string.
-    // (Pre condition)
-    // Determines if the string is valid using the given criteria.
-    // Post condition: bool; 
+bool article(string input)
+{
+    // Given a pre condition of valid string.
+    // Determines if the given string is an article.
+    vector<string> articles = { "the" };
 
+    bool status = false;
+
+    for (string word : articles) {
+        if (word == input) {
+            status = true;
+        }
+    }
+
+    return status;
+}
+
+bool noun(string input)
+{
     vector<string> nouns = { "birds", "fish", "c++", "apple", "car", "tree", "computer", "book", "river", "dog", "house", "sun", "moon",
 "mountain", "teacher", "phone", "pencil", "cat", "city", "ocean", "flower", "horse", "table",
 "chair", "window", "plane", "boat", "road", "cloud", "star", "pen", "clock", "shoe",
@@ -35,28 +50,61 @@ bool noun(string input)
 "train", "bicycle", "garden", "rain", "snow", "bridge", "cup", "map", "rock", "bed" };
 
     bool status = false;
-    /*
-    * if (word == "birds") {
-        status = true;
-    }
-    else if (word == "fish") {
-        status = true;
-    }
-    else if (word == "C++") {
-        status = true;
-    }
-    else {
-        //do nothing.
-    }
-    return status;
-    */
 
-    for(string word:nouns) {
+    for (string word : nouns) {
         if (word == input) {
             status = true;
         }
     }
 
-    return status; 
+    return status;
+}
+
+bool noun_phrase(string input)
+{   // Given a valid string.
+    // (Pre condition)
+    // Determines if the string is a noun phrase (article + noun) using the given criteria.
+    // Post condition: bool; 
+
+    // if the input string is an article, then check if the following string is a noun. Only under these conditions is it a noun
+    
+    if (article(input))
+    { // Check the next input.
+        string next = "";
+        cin >> next;
+
+        if (next == ".")
+        {
+            // In the event the article is followed by a period,
+            // Replace it in the cin (so the loop can read a '.' in main) and return false. 
+            // Because "the." is not a noun.
+            cin.putback('.');
+            return false;
+        }
+        else if (next != ".")
+        {
+            // In this event we check to see if its a noun.
+            if (noun(next))
+                // If it is return true we have (article + noun)
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+
+        } // end else if 
+    }
+    else if (!article(input))
+    {
+        return false;
+    }
+} // end function.
+
+void sentence(string input)
+{
+    // step one
+    cout << "test.";
 }
 

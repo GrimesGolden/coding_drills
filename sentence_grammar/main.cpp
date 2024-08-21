@@ -5,6 +5,8 @@
 
 int main()
 // Step One, make a program that can detect if input is a noun.
+// Step Two, make a program that can detect if article + noun is still a noun. 
+// Step Three, make a program that can detect if input is a sentence. 
 {   
     string input = "";
 
@@ -17,15 +19,20 @@ int main()
 
             strip_input(input);
 
-            if (input == ".") {
+            if (input == ".") 
+            {
                 continue;
-            } else if (noun(input)) {
+            } 
+            else if (noun_phrase(input)) 
+            {
+                cout << input << " is a noun phrase.\n";
+            } 
+            else if (noun(input))
+            {
                 cout << input << " is a noun.\n";
-            }
-            else if (!noun(input)) {
-                cout << input << " is NOT A noun.\n";
-            }
-            else {
+            } 
+            else 
+            {
                 cout << input << " is invalid.\n";
             }
         }
