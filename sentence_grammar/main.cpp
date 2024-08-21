@@ -19,23 +19,19 @@ int main()
 
             strip_input(input);
 
-            if (input == ".") 
+            if (input == ".")
             {
                 continue;
-            } 
-            else if (noun_phrase(input)) 
-            {
-                cout << input << " is a noun phrase.\n";
-            } 
-            else if (noun(input))
-            {
-                cout << input << " is a noun.\n";
-            } 
-            else 
-            {
-                cout << input << " is an invalid input.\n";
             }
-        }
+            else if (sentence(input))
+            {
+                cout << "'" << input << "'" << " is a sentence!\n";
+            }
+            else if (!sentence(input))
+            {
+                cout << "'" << input << "'" << " is NOT a sentence!\n";
+            }
+        } // end while
     }
     catch (const std::exception& e) 
     {

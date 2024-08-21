@@ -41,11 +41,14 @@ bool article(string input)
     return status;
 }
 
-bool verb(string input)
+bool verb(string& input)
 {
     // Given a pre condition of valid string.
     // Determines if the given string is a verb.
     vector<string> verbs = { "rules", "fly", "swim"};
+
+    // we strip input here, because this could grammatically be the end of a sentence.
+    strip_input(input);
 
     bool status = false;
 
@@ -62,6 +65,8 @@ bool conjunction(string input)
 {
     // Given a pre condition of valid string.
     // Determines if the given string is a conjunction.
+
+    // We do not strip input, because there is no valid sentence that has conjunction followed by '+'. 
     vector<string> verbs = { "and", "or", "but" };
 
     bool status = false;
@@ -120,12 +125,13 @@ bool noun_phrase(string& input)
         else if (next != ".")
         {   
             // In the event there is not a '.', we first combine input with this next string (whatever it might be).
+            // First strip the next word of '.'. Cin buffer now holds only '.'
+            strip_input(next);
             input = (input + " " + next);
             // Now a check to see if this next string (next) is a noun.
             if (noun(next))
                 // If it is return true we have (article + noun)
             {   
-                //input = (input + " " + next);
                 return true;
             }
             else 
@@ -143,9 +149,52 @@ bool noun_phrase(string& input)
     }
 } // end function.
 
-void sentence(string input)
-{
-    // step one
-    cout << "test.";
+bool sentence(string& input)
+{   
+    // Pre step: First check to see if this "sentence" is just a ".": in this case put the "." back and return false. // But is this not included in step one?
+    // step one: is it a noun or a noun phrase (the input that is)
+    // if it is not, it automatically fails. 
+    if (noun(input) || noun_phrase(input))
+    {
+        string next = "";
+        cin >> next;
+       // cout << "Value of next on line 169 is: " << next << "\n";
+        // This step again, it could almost be a function, but cant justify it. 
+        // This step exists to update the original input with the full extent of the sentence. 
+        // Used both for error messages and success outputs. 
+        strip_input(input);
+        input = (input + " " + next);
+
+
+        if (verb(next))
+        {
+            // Sentence == noun or noun phrase + verb
+            return true;
+        }
+        else if (!verb(next))
+        {
+            // False this is not a sentence. 
+            return false;
+        }
+        else
+        {
+            // I see no way this could occur, but compiler warns about control paths. 
+            error("Reality has imploded. Control paths defy all rational logic.");
+            return false;
+        }
+     } // end if
+     else if (!noun(input) && !noun_phrase(input)) // its not either of these
+    {
+        return false;
+    }
+
+
+    // step two: if it IS a noun or noun phrase, check to see if its followed by a verb.
+    // in this case, and this case only, we have a sentence.
+    else 
+    {
+        error("Error in sentence() function, control path failed.");
+        return false; 
+    }
 }
 
