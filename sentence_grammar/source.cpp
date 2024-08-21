@@ -41,13 +41,49 @@ bool article(string input)
     return status;
 }
 
-bool noun(string input)
+bool verb(string input)
+{
+    // Given a pre condition of valid string.
+    // Determines if the given string is a verb.
+    vector<string> verbs = { "rules", "fly", "swim"};
+
+    bool status = false;
+
+    for (string word : verbs) {
+        if (word == input) {
+            status = true;
+        }
+    }
+
+    return status;
+}
+
+bool conjunction(string input)
+{
+    // Given a pre condition of valid string.
+    // Determines if the given string is a conjunction.
+    vector<string> verbs = { "and", "or", "but" };
+
+    bool status = false;
+
+    for (string word : verbs) {
+        if (word == input) {
+            status = true;
+        }
+    }
+
+    return status;
+}
+
+bool noun(string& input)
 {
     vector<string> nouns = { "birds", "fish", "c++", "apple", "car", "tree", "computer", "book", "river", "dog", "house", "sun", "moon",
 "mountain", "teacher", "phone", "pencil", "cat", "city", "ocean", "flower", "horse", "table",
 "chair", "window", "plane", "boat", "road", "cloud", "star", "pen", "clock", "shoe",
 "beach", "forest", "grass", "lamp", "school", "desk", "shirt", "hat", "door", "sand",
 "train", "bicycle", "garden", "rain", "snow", "bridge", "cup", "map", "rock", "bed" };
+
+    strip_input(input);
 
     bool status = false;
 
@@ -60,7 +96,7 @@ bool noun(string input)
     return status;
 }
 
-bool noun_phrase(string input)
+bool noun_phrase(string& input)
 {   // Given a valid string.
     // (Pre condition)
     // Determines if the string is a noun phrase (article + noun) using the given criteria.
@@ -82,15 +118,20 @@ bool noun_phrase(string input)
             return false;
         }
         else if (next != ".")
-        {
-            // In this event we check to see if its a noun.
+        {   
+            // In the event there is not a '.', we first combine input with this next string (whatever it might be).
+            input = (input + " " + next);
+            // Now a check to see if this next string (next) is a noun.
             if (noun(next))
                 // If it is return true we have (article + noun)
-            {
+            {   
+                //input = (input + " " + next);
                 return true;
             }
             else 
-            {
+            {   
+                // In this case we dont have a noun phrase, what we have is an article combined with something not a noun.
+                // A grammatical error, which is why we combined it with the orginal input, to make for a useful error message back in the calling function.
                 return false;
             }
 

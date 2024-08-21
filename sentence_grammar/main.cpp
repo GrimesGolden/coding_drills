@@ -33,7 +33,7 @@ int main()
             } 
             else 
             {
-                cout << input << " is invalid.\n";
+                cout << input << " is an invalid input.\n";
             }
         }
     }
