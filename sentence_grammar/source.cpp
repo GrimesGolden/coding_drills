@@ -1,12 +1,97 @@
 #include "source.h";
 
+void pop_front(vector<string>& vec)
+{   
+    // Purpose: removes the first element from the given vector.
+    // Pre Condition: A vector of string passed by reference. 
+    // Post Condition: None, due to modifying by reference.
+  
+    // Remove the first element
+    if (!vec.empty()) {
+        vec.erase(vec.begin()); // Erase the first element
+    }
+
+    // Print the vector after removal
+    cout << "After popping front element: ";
+    for (string val : vec) {
+        cout << val << " ";
+    }
+    cout << "\n";
+}
+bool end_detected(string& word)
+{   
+    // Pre-Condition: Can handle any string, but only verbs should ever enter this function (test for this).
+    // Post-Condition: A bool, determining if it does in fact end with a period. 
+    // Note: we should alter strip_word to strip only a copy of the word, because we only want to test if its a verb. 
+    bool valid = false;
+
+    if (word.size() <= 1)
+    {   
+        // If the size of the word suggests an empty string. 
+        // Return, we do not want to handle this scenario.
+        return valid;
+    }
+    else if (word.size() > 2)
+    {   
+        // In the case we have some reasonable size of string.
+        // Test that the last char is in fact a  '.'.
+        int last_index = word.size() - 1;
+        char end = '.';
+
+        if (word[last_index] == end)
+        {
+            valid = true;
+        }
+    }
+    return valid;
+}
+void fill_stream(vector<string>& string_stream)
+{
+    // Purpose: Fill a vector with the given line of input (sentence).
+    // Pre-Condition: A vector of string, passed by ref.
+    // Post-Condit: Due to pass by reference, returns no value.
+    // 
+    // Read a line of input from the user
+    string line;
+    cout << "Enter a sentence: ";
+    getline(cin, line);
+
+    // Create a string stream from the line of input
+    istringstream stream(line);
+    string word;
+
+    // Extract words from the stream and store them in a vector
+    while (stream >> word) {
+        string_stream.push_back(word);
+
+        if (end_detected(word))
+        {   
+            cout << "Ending input.";
+            break;
+        }
+    }
+}
+
+void read_stream(vector<string>& string_stream)
+{   // Purpose: Output the "string_stream" vector of strings as a sentence.
+    // Pre-Condition: A vector of string, passed by ref.
+    // Post-Condit: Due to pass by reference, returns no value.
+    cout << "You entered:";
+    // Output individual words
+    for (const auto& w : string_stream) {
+        cout << w << " ";
+    }
+
+    cout << "\n";
+}
+
 void strip_input(string& input)
 {   
     // Strips the '.' from a given string. such as "hello." ==> "hello"
     // Pre-Condition: Any valid string, passed by reference.
-    // In the event the strings last element is a '.':
-    // This function will put a copy of the '.' back into the cin buffer 
-    // then pop_back this element, effectively destroying it. 
+    // Post-Condition: None, string will be altered by reference. 
+    // 
+    // In the event the strings last element is a '.': pop back
 
 
     if (input.size() > 1) // This is important, because "." is not to be stripped. 
@@ -16,18 +101,17 @@ void strip_input(string& input)
 
         if (last == '.')
         {   
-            //cin.putback(last);
-            //input.erase (input.begin()+last_index);
-            cin.putback(last);
             input.pop_back();
         }
     }
 }
 
-bool article(string input)
-{
-    // Given a pre condition of valid string.
-    // Determines if the given string is an article.
+bool article(string& input)
+{   
+    // Purpose: Determine if the given string is an article.
+    // Pre condition of valid string: passed by reference for memory and clarity.
+    // Post Condition: A bool determing if article (T)
+
     vector<string> articles = { "the" };
 
     bool status = false;
@@ -42,12 +126,16 @@ bool article(string input)
 }
 
 bool verb(string& input)
-{
-    // Given a pre condition of valid string.
-    // Determines if the given string is a verb.
+{   
+    // Purpose: Determine if the given string is a verb.
+    // Pre condition of valid string: passed by reference for memory and clarity.
+    // Post Condition: A bool determing if string is a verb (T).
+
     vector<string> verbs = { "rules", "fly", "swim"};
 
     // we strip input here, because this could grammatically be the end of a sentence.
+    // DEBUG be careful with this. Its only needed under particular circumstances, which sentence logic will handle.
+    // At the very least we may want to NOT pass by reference here. Why? = We dont want to alter the sentence merely to determine if it contains a verb.
     strip_input(input);
 
     bool status = false;
@@ -61,10 +149,11 @@ bool verb(string& input)
     return status;
 }
 
-bool conjunction(string input)
-{
-    // Given a pre condition of valid string.
-    // Determines if the given string is a conjunction.
+bool conjunction(string& input)
+{   
+    // Purpose: Determine if the given string is a conjunction.
+    // Pre condition of valid string: passed by reference for memory and clarity.
+    // Post Condition: A bool determing if string is a conjunction (T).
 
     // We do not strip input, because there is no valid sentence that has conjunction followed by '+'. 
     vector<string> verbs = { "and", "or", "but" };
@@ -81,14 +170,16 @@ bool conjunction(string input)
 }
 
 bool noun(string& input)
-{
+{   
+    // Purpose: Determine if the given string is a noun.
+    // Pre condition of valid string: passed by reference for memory and clarity.
+    // Post Condition: A bool determing if string is a noun (T).
+
     vector<string> nouns = { "birds", "fish", "c++", "apple", "car", "tree", "computer", "book", "river", "dog", "house", "sun", "moon",
-"mountain", "teacher", "phone", "pencil", "cat", "city", "ocean", "flower", "horse", "table",
+"mountain", "teacher", "phone", "pencil", "cats", "city", "ocean", "flower", "horses", "table",
 "chair", "window", "plane", "boat", "road", "cloud", "star", "pen", "clock", "shoe",
 "beach", "forest", "grass", "lamp", "school", "desk", "shirt", "hat", "door", "sand",
 "train", "bicycle", "garden", "rain", "snow", "bridge", "cup", "map", "rock", "bed" };
-
-    strip_input(input);
 
     bool status = false;
 
@@ -101,100 +192,72 @@ bool noun(string& input)
     return status;
 }
 
-bool noun_phrase(string& input)
-{   // Given a valid string.
-    // (Pre condition)
-    // Determines if the string is a noun phrase (article + noun) using the given criteria.
-    // Post condition: bool; 
+bool phrase(string& l_str, string& r_string)
+{   // Purpose: Determine if the given string_stream represents a noun phrase (phrase).
+    // Pre condition: Two valid strings, passed by reference for memory and clarity.
+    // Post Condition: A bool determining if strings represent a phrase(T). 
+     // DO WE EVEN NEED THIS FUNCTION?.
 
-    // if the input string is an article, then check if the following string is a noun. Only under these conditions is it a noun
-    
-    if (article(input))
-    { // Check the next input.
-        string next = "";
-        cin >> next;
+    bool valid = false;
 
-        if (next == ".")
-        {
-            // In the event the article is followed by a period,
-            // Replace it in the cin (so the loop can read a '.' in main) and return false. 
-            // Because "the." is not a noun.
-            cin.putback('.');
-            return false;
-        }
-        else if (next != ".")
-        {   
-            // In the event there is not a '.', we first combine input with this next string (whatever it might be).
-            // First strip the next word of '.'. Cin buffer now holds only '.'
-            strip_input(next);
-            input = (input + " " + next);
-            // Now a check to see if this next string (next) is a noun.
-            if (noun(next))
-                // If it is return true we have (article + noun)
-            {   
-                return true;
-            }
-            else 
-            {   
-                // In this case we dont have a noun phrase, what we have is an article combined with something not a noun.
-                // A grammatical error, which is why we combined it with the orginal input, to make for a useful error message back in the calling function.
-                return false;
-            }
-
-        } // end else if 
-    }
-    else if (!article(input))
+    if (article(l_str) && noun(r_string))
     {
-        return false;
+        valid = true;
     }
+
+    return valid;
 } // end function.
 
-bool sentence(string& input)
-{   
-    // Pre step: First check to see if this "sentence" is just a ".": in this case put the "." back and return false. // But is this not included in step one?
-    // step one: is it a noun or a noun phrase (the input that is)
-    // if it is not, it automatically fails. 
-    if (noun(input) || noun_phrase(input))
+bool sentence(vector<string>& string_stream)
+{
+    // Purpose: Determine if the given stream, represents a valid sentence.
+    // Pre Condition: A vector of string passed by reference, for memory and clarity.
+    // Post Condition: A bool, defining if the given sentence represents a phrase.
+
+    // Begin.
+    bool valid = false;
+
+    // If the string_stream is empty, we have an error
+    if (string_stream.size() <= 0)
     {
-        string next = "";
-        cin >> next;
-       // cout << "Value of next on line 169 is: " << next << "\n";
-        // This step again, it could almost be a function, but cant justify it. 
-        // This step exists to update the original input with the full extent of the sentence. 
-        // Used both for error messages and success outputs. 
-        strip_input(input);
-        input = (input + " " + next);
+        error("Empty vector passed to sentence()");
+    }
+    else if (string_stream.size() > 0)
+    {
+        // If the string stream is greater than 0, we are off to a valid start.
+        string sentence = string_stream[0];
 
-
-        if (verb(next))
+        if (article(sentence))
         {
-            // Sentence == noun or noun phrase + verb
-            return true;
+            // If the first word is an article, lets check if it's followed by a noun
+            if (string_stream.size() >= 2 && noun(string_stream[1])) // Verify string_stream.size() >= 2
+            {   
+                // If the first word
+                sentence = sentence + " " + string_stream[1];
+                cout << sentence << " : begins with a valid noun phrase.\n";
+                pop_front(string_stream);
+                pop_front(string_stream);
+            }
+            
         }
-        else if (!verb(next))
+        else if (noun(sentence))
         {
-            // False this is not a sentence. 
-            return false;
+            // If the first word is a noun check for a following verb.
+            cout << sentence << " begins with a noun.";
+            valid = true;
         }
         else
         {
-            // I see no way this could occur, but compiler warns about control paths. 
-            error("Reality has imploded. Control paths defy all rational logic.");
-            return false;
+            // The first word is not a valid article or noun.
+            // Return at this point (return false)
+            cout << sentence << " This does not contain a valid noun or noun phrase.\n";
+            return valid;
         }
-     } // end if
-     else if (!noun(input) && !noun_phrase(input)) // its not either of these
-    {
-        return false;
+        return valid;
     }
 
 
-    // step two: if it IS a noun or noun phrase, check to see if its followed by a verb.
-    // in this case, and this case only, we have a sentence.
-    else 
-    {
-        error("Error in sentence() function, control path failed.");
-        return false; 
-    }
+
+
 }
 

@@ -3,35 +3,24 @@
 
 #include "source.h";
 
+vector<string> string_stream;
+
+
 int main()
 // Step One, make a program that can detect if input is a noun.
 // Step Two, make a program that can detect if article + noun is still a noun. 
 // Step Three, make a program that can detect if input is a sentence. 
 {   
-    string input = "";
-
-    
     try
     {
-        while (input != ".")
+        fill_stream(string_stream);
+        read_stream(string_stream);
+
+        if (sentence(string_stream))
         {
-            cin >> input;
+            cout << " valid\n";
+        }
 
-            strip_input(input);
-
-            if (input == ".")
-            {
-                continue;
-            }
-            else if (sentence(input))
-            {
-                cout << "'" << input << "'" << " is a sentence!\n";
-            }
-            else if (!sentence(input))
-            {
-                cout << "'" << input << "'" << " is NOT a sentence!\n";
-            }
-        } // end while
     }
     catch (const std::exception& e) 
     {
