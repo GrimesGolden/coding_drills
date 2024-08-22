@@ -15,6 +15,9 @@ int main()
     {
         fill_stream(string_stream);
         read_stream(string_stream);
+        cout << "Poppin'";
+        pop_front(string_stream);
+        read_stream(string_stream);
 
         if (sentence(string_stream))
         {

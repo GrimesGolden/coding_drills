@@ -10,13 +10,6 @@ void pop_front(vector<string>& vec)
     if (!vec.empty()) {
         vec.erase(vec.begin()); // Erase the first element
     }
-
-    // Print the vector after removal
-    cout << "After popping front element: ";
-    for (string val : vec) {
-        cout << val << " ";
-    }
-    cout << "\n";
 }
 bool end_detected(string& word)
 {   
@@ -106,74 +99,98 @@ void strip_input(string& input)
     }
 }
 
-bool article(string& input)
+bool article(vector<string>& string_stream)
 {   
-    // Purpose: Determine if the given string is an article.
-    // Pre condition of valid string: passed by reference for memory and clarity.
+    // Purpose: Determine if the given sentence begins with an article.
+    // Pre condition of valid string vector: passed by reference for memory and clarity.
     // Post Condition: A bool determing if article (T)
 
     vector<string> articles = { "the" };
 
     bool status = false;
 
-    for (string word : articles) {
-        if (word == input) {
-            status = true;
+    if (!string_stream.empty())
+    {   
+        // If the stream (sentence) is not empty, check that the first string element is an article.
+        string input = string_stream[0];
+
+        // If it is an article remove that element from the sentence, and return true. 
+        for (string word : articles) {
+            if (word == input) {
+                pop_front(string_stream);
+                status = true;
+            }
         }
     }
 
     return status;
 }
 
-bool verb(string& input)
+bool verb(vector<string>& string_stream)
 {   
-    // Purpose: Determine if the given string is a verb.
-    // Pre condition of valid string: passed by reference for memory and clarity.
-    // Post Condition: A bool determing if string is a verb (T).
+    // Purpose: Determine if the given sentence begins with a verb.
+    // Pre condition of valid string vector: passed by reference for memory and clarity.
+    // Post Condition: A bool determing if verb (T)
 
     vector<string> verbs = { "rules", "fly", "swim"};
 
     // we strip input here, because this could grammatically be the end of a sentence.
     // DEBUG be careful with this. Its only needed under particular circumstances, which sentence logic will handle.
     // At the very least we may want to NOT pass by reference here. Why? = We dont want to alter the sentence merely to determine if it contains a verb.
-    strip_input(input);
+    //strip_input(input);
 
     bool status = false;
 
-    for (string word : verbs) {
-        if (word == input) {
-            status = true;
+    if (!string_stream.empty())
+    {
+        // If the stream (sentence) is not empty, check that the first string element is a verb.
+        string input = string_stream[0];
+
+        // If it is a verb remove that element from the sentence, and return true. 
+        for (string word : verbs) {
+            if (word == input) {
+                pop_front(string_stream);
+                status = true;
+            }
         }
     }
 
     return status;
 }
 
-bool conjunction(string& input)
+bool conjunction(vector<string>& string_stream)
 {   
-    // Purpose: Determine if the given string is a conjunction.
-    // Pre condition of valid string: passed by reference for memory and clarity.
-    // Post Condition: A bool determing if string is a conjunction (T).
+    // Purpose: Determine if the given sentence begins with a conjunction.
+    // Pre condition of valid string vector: passed by reference for memory and clarity.
+    // Post Condition: A bool determing if conjunction (T)
 
-    // We do not strip input, because there is no valid sentence that has conjunction followed by '+'. 
-    vector<string> verbs = { "and", "or", "but" };
+    // We do not strip input, because there is no valid sentence that has conjunction followed by '.' 
+    vector<string> conjunctions = { "and", "or", "but" };
 
     bool status = false;
 
-    for (string word : verbs) {
-        if (word == input) {
-            status = true;
+    if (!string_stream.empty())
+    {
+        // If the stream (sentence) is not empty, check that the first string element is a verb.
+        string input = string_stream[0];
+
+        // If it is a verb remove that element from the sentence, and return true. 
+        for (string word : conjunctions) {
+            if (word == input) {
+                pop_front(string_stream);
+                status = true;
+            }
         }
     }
 
     return status;
 }
 
-bool noun(string& input)
+bool noun(vector<string>& string_stream)
 {   
-    // Purpose: Determine if the given string is a noun.
-    // Pre condition of valid string: passed by reference for memory and clarity.
-    // Post Condition: A bool determing if string is a noun (T).
+    // Purpose: Determine if the given sentence begins with a noun.
+    // Pre condition of valid string vector: passed by reference for memory and clarity.
+    // Post Condition: A bool determing if noun (T)
 
     vector<string> nouns = { "birds", "fish", "c++", "apple", "car", "tree", "computer", "book", "river", "dog", "house", "sun", "moon",
 "mountain", "teacher", "phone", "pencil", "cats", "city", "ocean", "flower", "horses", "table",
@@ -183,29 +200,44 @@ bool noun(string& input)
 
     bool status = false;
 
-    for (string word : nouns) {
-        if (word == input) {
-            status = true;
+    if (!string_stream.empty())
+    {
+        // If the stream (sentence) is not empty, check that the first string element is a verb.
+        string input = string_stream[0];
+
+        // If it is a verb remove that element from the sentence, and return true. 
+        for (string word : nouns) {
+            if (word == input) {
+                pop_front(string_stream);
+                status = true;
+            }
         }
     }
 
     return status;
 }
 
-bool phrase(string& l_str, string& r_string)
-{   // Purpose: Determine if the given string_stream represents a noun phrase (phrase).
-    // Pre condition: Two valid strings, passed by reference for memory and clarity.
-    // Post Condition: A bool determining if strings represent a phrase(T). 
-     // DO WE EVEN NEED THIS FUNCTION?.
+bool phrase(vector<string>& string_stream)
+{   // Purpose: Determine if the given sentence begins with a phrase.
+    // Pre condition of valid string vector: passed by reference for memory and clarity.
+    // Post Condition: A bool determing if phrase (T)
 
     bool valid = false;
 
-    if (article(l_str) && noun(r_string))
+    if (article(string_stream))
     {
-        valid = true;
+        if (noun(string_stream))
+        {   
+            // In the event that this stream contained both an article, and a noun, return true.
+            // The entire phrase has now been popped from the string. 
+            valid = true;
+        }
     }
-
-    return valid;
+    else
+    {   
+        // Return false, because phrases only begin with an article.
+        return valid;
+    }
 } // end function.
 
 bool sentence(vector<string>& string_stream)
@@ -218,42 +250,19 @@ bool sentence(vector<string>& string_stream)
     bool valid = false;
 
     // If the string_stream is empty, we have an error
-    if (string_stream.size() <= 0)
+    if (string_stream.empty())
     {
         error("Empty vector passed to sentence()");
     }
-    else if (string_stream.size() > 0)
+    else
     {
-        // If the string stream is greater than 0, we are off to a valid start.
-        string sentence = string_stream[0];
-
-        if (article(sentence))
+        // If the string stream is not empty, we are off to a possibly valid start.
+        // Lets begin at the top. Does it contain a noun or a phrase?
+        if (noun(string_stream) || phrase(string_stream))
         {
-            // If the first word is an article, lets check if it's followed by a noun
-            if (string_stream.size() >= 2 && noun(string_stream[1])) // Verify string_stream.size() >= 2
-            {   
-                // If the first word
-                sentence = sentence + " " + string_stream[1];
-                cout << sentence << " : begins with a valid noun phrase.\n";
-                pop_front(string_stream);
-                pop_front(string_stream);
-            }
-            
+            // If it does contain a noun or phrase? is it followed by a verb?
+            // 
         }
-        else if (noun(sentence))
-        {
-            // If the first word is a noun check for a following verb.
-            cout << sentence << " begins with a noun.";
-            valid = true;
-        }
-        else
-        {
-            // The first word is not a valid article or noun.
-            // Return at this point (return false)
-            cout << sentence << " This does not contain a valid noun or noun phrase.\n";
-            return valid;
-        }
-        return valid;
     }
 
 
