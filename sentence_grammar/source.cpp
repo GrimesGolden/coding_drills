@@ -11,32 +11,37 @@ void pop_front(vector<string>& vec)
         vec.erase(vec.begin()); // Erase the first element
     }
 }
-bool end_detected(string& word)
-{   
-    // Pre-Condition: Can handle any string, but only verbs should ever enter this function (test for this).
-    // Post-Condition: A bool, determining if it does in fact end with a period. 
-    // Note: we should alter strip_word to strip only a copy of the word, because we only want to test if its a verb. 
-    bool valid = false;
 
-    if (word.size() <= 1)
+bool end_detected(vector<string>& string_stream)
+{
+    // Pre-Condition: A string vectors passed by reference, required for modification (removal of '.').
+    // Post-Condition: A bool, determining if it does in fact end with a period.  
+    bool valid = false;
+    
+    if (string_stream.size() != 1)
     {   
-        // If the size of the word suggests an empty string. 
-        // Return, we do not want to handle this scenario.
+        //A period only occurs at the end of a sentence.
         return valid;
     }
-    else if (word.size() > 2)
+
+    else
     {   
-        // In the case we have some reasonable size of string.
-        // Test that the last char is in fact a  '.'.
-        int last_index = word.size() - 1;
+        string word = string_stream[0];
+        int last_char = word.size() - 1;
         char end = '.';
 
-        if (word[last_index] == end)
-        {
+        if (word[last_char] != end)
+        {   
+            return valid;
+        }
+        else
+        {   
+            // If the last character is '.' then remove it, and return true.
+            strip_input(string_stream[0]);
             valid = true;
+            return valid; 
         }
     }
-    return valid;
 }
 void fill_stream(vector<string>& string_stream)
 {
@@ -56,12 +61,6 @@ void fill_stream(vector<string>& string_stream)
     // Extract words from the stream and store them in a vector
     while (stream >> word) {
         string_stream.push_back(word);
-
-        if (end_detected(word))
-        {   
-            cout << "Ending input.";
-            break;
-        }
     }
 }
 
@@ -134,16 +133,11 @@ bool verb(vector<string>& string_stream)
 
     vector<string> verbs = { "rules", "fly", "swim"};
 
-    // we strip input here, because this could grammatically be the end of a sentence.
-    // DEBUG be careful with this. Its only needed under particular circumstances, which sentence logic will handle.
-    // At the very least we may want to NOT pass by reference here. Why? = We dont want to alter the sentence merely to determine if it contains a verb.
-    //strip_input(input);
-
     bool status = false;
 
     if (!string_stream.empty())
     {
-        // If the stream (sentence) is not empty, check that the first string element is a verb.
+        // If the stream (sentence) is not empty, check that the first string element is a valid verb.
         string input = string_stream[0];
 
         // If it is a verb remove that element from the sentence, and return true. 
@@ -158,7 +152,7 @@ bool verb(vector<string>& string_stream)
     return status;
 }
 
-bool conjunction(vector<string>& string_stream)
+bool is_conjunction(vector<string>& string_stream)
 {   
     // Purpose: Determine if the given sentence begins with a conjunction.
     // Pre condition of valid string vector: passed by reference for memory and clarity.
@@ -259,9 +253,36 @@ bool sentence(vector<string>& string_stream)
         // If the string stream is not empty, we are off to a possibly valid start.
         // Lets begin at the top. Does it contain a noun or a phrase?
         if (noun(string_stream) || phrase(string_stream))
-        {
-            // If it does contain a noun or phrase? is it followed by a verb?
-            // 
+        {   
+            // If it does contain a noun or phrase? is it possibly followed by a verb?
+            if (string_stream.size() >= 1)
+            {   
+                if (end_detected(string_stream) && verb(string_stream))
+                {   
+                    // And is that verb occuring at the end of a sentence?
+                    pop_front(string_stream);
+                    valid = true;
+                    return valid;
+                }
+                else if (is_conjunction(string_stream))
+                {   
+                    pop_front(string_stream);
+                    valid = true;
+                }
+                else
+                {   
+                    return valid;
+                }
+            }
+            else
+            {
+                // A phrase or noun alone, do not make a sentence. We can safely return false.
+                return valid;
+            }
+        } // End if noun or phrase
+        else
+        {   
+            return valid;
         }
     }
 

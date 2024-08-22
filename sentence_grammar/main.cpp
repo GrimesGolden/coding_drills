@@ -11,17 +11,16 @@ int main()
 // Step Two, make a program that can detect if article + noun is still a noun. 
 // Step Three, make a program that can detect if input is a sentence. 
 {   
+    // At this stage of the program, a phrase such as "bird fly" or "the birds fly" should register as a valid sentence. 
+    // Noun + verb or noun phrase + verb. 
     try
     {
         fill_stream(string_stream);
         read_stream(string_stream);
-        cout << "Poppin'";
-        pop_front(string_stream);
-        read_stream(string_stream);
-
+        
         if (sentence(string_stream))
         {
-            cout << " valid\n";
+            cout << " is a valid sentence\n";
         }
 
     }
