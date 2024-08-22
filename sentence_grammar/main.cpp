@@ -20,7 +20,7 @@ int main()
         
         if (sentence(string_stream))
         {
-            cout << " is a valid sentence\n";
+            cout << " it is a valid sentence\n";
         }
 
     }

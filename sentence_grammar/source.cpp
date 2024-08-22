@@ -240,7 +240,7 @@ bool sentence(vector<string>& string_stream)
     // Pre Condition: A vector of string passed by reference, for memory and clarity.
     // Post Condition: A bool, defining if the given sentence represents a phrase.
 
-    // Begin.
+    // Begin. // Nasty, needs a refactor. 
     bool valid = false;
 
     // If the string_stream is empty, we have an error
@@ -260,14 +260,23 @@ bool sentence(vector<string>& string_stream)
                 if (end_detected(string_stream) && verb(string_stream))
                 {   
                     // And is that verb occuring at the end of a sentence?
-                    pop_front(string_stream);
                     valid = true;
                     return valid;
                 }
-                else if (is_conjunction(string_stream))
+                else if (verb(string_stream) && is_conjunction(string_stream))
                 {   
-                    pop_front(string_stream);
-                    valid = true;
+                    if (sentence(string_stream))
+                        
+                    {
+                        // A conjunction followed by a sentence == valid.
+                        valid = true;
+                        return valid;
+                    }
+                    else
+                    {   
+                        // false. Ends with a conjunction and no follow up sentence. 
+                        return valid;
+                    }
                 }
                 else
                 {   
@@ -281,7 +290,7 @@ bool sentence(vector<string>& string_stream)
             }
         } // End if noun or phrase
         else
-        {   
+        {   // not a noun or noun phrase == not a sentence. 
             return valid;
         }
     }
