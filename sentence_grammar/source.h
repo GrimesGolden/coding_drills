@@ -8,8 +8,6 @@ bool is_conjunction(vector<string>& string_stream);
 bool article(vector<string>& string_stream);
 bool sentence(vector<string>& string_stream);
 void strip_input(string& input);
-
-//New
 void pop_front(vector<string>& vec);
 bool end_detected(vector<string>& string_stream);
 void fill_stream(vector<string>& string_stream);

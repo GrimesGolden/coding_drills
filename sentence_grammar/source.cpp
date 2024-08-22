@@ -131,6 +131,8 @@ bool verb(vector<string>& string_stream)
     // Pre condition of valid string vector: passed by reference for memory and clarity.
     // Post Condition: A bool determing if verb (T)
 
+    // Lets allow verb to check if the given stream contains a verb at the end of a sentence. Or a verb followed by a conjunction.
+
     vector<string> verbs = { "rules", "fly", "swim"};
 
     bool status = false;
@@ -138,13 +140,16 @@ bool verb(vector<string>& string_stream)
     if (!string_stream.empty())
     {
         // If the stream (sentence) is not empty, check that the first string element is a valid verb.
-        string input = string_stream[0];
-
-        // If it is a verb remove that element from the sentence, and return true. 
-        for (string word : verbs) {
-            if (word == input) {
-                pop_front(string_stream);
-                status = true;
+        if (end_detected(string_stream) || string_stream.size() > 1) 
+        {
+            // If it is a verb remove that element from the sentence, and return true. 
+            string input = string_stream[0];
+    
+            for (string word : verbs) {
+                if (word == input) {
+                    pop_front(string_stream);
+                    status = true;
+                }
             }
         }
     }
@@ -244,59 +249,33 @@ bool sentence(vector<string>& string_stream)
     bool valid = false;
 
     // If the string_stream is empty, we have an error
-    if (string_stream.empty())
+    // If the string stream is not empty, we are off to a possibly valid start.
+    // Then lets begin at the top. Does it contain a noun or a phrase?
+    if (!string_stream.empty() && (noun(string_stream) || phrase(string_stream)))
     {
-        error("Empty vector passed to sentence()");
-    }
-    else
-    {
-        // If the string stream is not empty, we are off to a possibly valid start.
-        // Lets begin at the top. Does it contain a noun or a phrase?
-        if (noun(string_stream) || phrase(string_stream))
-        {   
-            // If it does contain a noun or phrase? is it possibly followed by a verb?
-            if (string_stream.size() >= 1)
-            {   
-                if (end_detected(string_stream) && verb(string_stream))
-                {   
-                    // And is that verb occuring at the end of a sentence?
-                    valid = true;
-                    return valid;
-                }
-                else if (verb(string_stream) && is_conjunction(string_stream))
-                {   
-                    if (sentence(string_stream))
-                        
-                    {
-                        // A conjunction followed by a sentence == valid.
-                        valid = true;
-                        return valid;
-                    }
-                    else
-                    {   
-                        // false. Ends with a conjunction and no follow up sentence. 
-                        return valid;
-                    }
-                }
-                else
-                {   
-                    return valid;
-                }
-            }
-            else
-            {
-                // A phrase or noun alone, do not make a sentence. We can safely return false.
-                return valid;
-            }
-        } // End if noun or phrase
-        else
-        {   // not a noun or noun phrase == not a sentence. 
+        if (verb(string_stream) && string_stream.empty())
+            // If the sentence is now empty (ended), and the final word was a valid verb.
+            // Then its a sentence.
+        {
+            valid = true;
             return valid;
         }
+        else if (is_conjunction(string_stream))
+        {
+            // If the rest of the stream contains a valid sentence after the conjunction.
+            // Return true.
+            valid = sentence(string_stream);
+            return valid;
+        }
+        else
+        {
+            // False.
+            return valid;
+        }
+    } // End if noun or phrase
+    else
+    {   // not a noun or noun phrase == not a sentence. 
+        return valid;
     }
-
-
-
-
 }
 
