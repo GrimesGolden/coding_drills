@@ -15,25 +15,38 @@ int get_int()
     // Receive a valid int from the user then return it.
     int number = 0;
     bool valid = false;
-    cout << "Input an int >>";
+    cout << "Enter your input >>";
 
     while (!valid)
     {
-        if (cin >> number)
+        if (cin >> number && number <= 16 && number >= 1)
         {
-            cout << "Good job input accepted: " << number << "\n";
+            cout << "Input accepted: " << number << "\n";
             clear_buffer();
             valid = true;
         }
         else
         {
-            cout << "Error invalid input, try again.\n";
+            cout << "Error invalid input, try again.\n >>";
             clear_buffer();
         }
     }
 
     return number;
 }
+
+void welcome() {
+    cout << "**************************************************\n"
+        "* Welcome to the Permutation and Combo Calculator *\n"
+        "*                                                *\n"
+        "* Please choose an option:                     *\n"
+        "*                                                *\n"
+        "* 1. Calculate a Permutation                    *\n"
+        "* 2. Calculate a Combination                    *\n"
+        "*                                                *\n"
+        "**************************************************\n";
+}
+
 
 int factorial(int input)
 {
@@ -64,15 +77,78 @@ int factorial(int input)
     }
 }
 
+void get_values(int& a, int& b)
+{
+    cout << "Enter number of items in main set (for example possible numbers in a combo lock)\n";
+    a = get_int();
+
+    cout << "Next enter number of items in sub set (for example the amount of digits in the combo locks combo)\n";
+    b = get_int();
+}
+
+void permutation()
+{   
+    int a = 0;
+    int b = 0;
+
+    get_values(a, b);
+
+    cout << "Performing permutation with a == " << a << " and b == " << b << "\n";
+
+}
+
+void combo()
+{
+    int a = 0;
+    int b = 0;
+
+    get_values(a, b);
+
+    cout << "Performing combination with a == " << a << " and b == " << b << "\n";
+
+}
+
+void control_path(int input)
+{
+    // Output a message regarding correct user selection.
+    switch (input)
+    {
+    case 1:
+        cout << "Permutation selected.\n";
+        permutation();
+        break;
+    case 2:
+        cout << "Combination selected.\n";
+        combo();
+        break;
+    default:
+        cout << "Error, incorrect selection.\n";
+        break;
+    }
+}
+
+void select_option()
+{
+    // Finalize correct user selection.
+    int input = get_int();
+    control_path(input);
+
+    while (input != 1 && input != 2)
+    {
+        int input = get_int();
+        control_path(input);
+    }
+}
+
 int main()
 {   
     try
-    {
+    {   
+        welcome();
+
         while (true)
         {
-            int number = get_int();
-
-            cout << number << " factorial == " << factorial(number) << "\n\n";
+            select_option();
         }
     }
     catch (exception e)
