@@ -10,16 +10,16 @@ void clear_buffer()
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
-int get_int()
+long long get_int()
 {
     // Receive a valid int from the user then return it.
-    int number = 0;
+    long long number = 0;
     bool valid = false;
     cout << "Enter your input >>";
 
     while (!valid)
     {
-        if (cin >> number && number <= 16 && number >= 1)
+        if (cin >> number && number <= 20 && number >= 1)
         {
             cout << "Input accepted: " << number << "\n";
             clear_buffer();
@@ -48,7 +48,7 @@ void welcome() {
 }
 
 
-int factorial(int input)
+long long factorial(long long input)
 {
     // Working factorial function.
     // Pre Condition: Must take an integer between 0 and 16.
@@ -61,13 +61,13 @@ int factorial(int input)
     {
         error("negative factorial detected.");
     }
-    else if (input >= 17)
+    else if (input > 20)
     {
-        error("factorial is too large (max is 16!)");
+        error("factorial is too large (max is 20!)");
     }
     else
     {
-        int result = input;
+        long long result = input;
         while (input > 1)
         {
             result *= (input - 1);
@@ -77,7 +77,7 @@ int factorial(int input)
     }
 }
 
-void get_values(int& a, int& b)
+void get_values(long long& a, long long& b)
 {
     cout << "Enter number of items in main set (for example possible numbers in a combo lock)\n";
     a = get_int();
@@ -86,56 +86,65 @@ void get_values(int& a, int& b)
     b = get_int();
 }
 
-void permutation()
+long long calculate(int selection)
 {   
-    int a = 0;
-    int b = 0;
+    long long a = 0;
+    long long b = 0;
 
     get_values(a, b);
 
-    cout << "Performing permutation with a == " << a << " and b == " << b << "\n";
+    long long numerator = factorial(a);
+    long long denominator = factorial((a - b));
 
-}
+    long long p = numerator / denominator;
 
-void combo()
-{
-    int a = 0;
-    int b = 0;
-
-    get_values(a, b);
-
-    cout << "Performing combination with a == " << a << " and b == " << b << "\n";
-
+    switch (selection)
+    {
+    case 1:
+        return p;
+        break;
+    case 2:
+    {
+        denominator = factorial(b);
+        return (p / denominator);
+    }
+    default:
+        error("Holy SHIT, bad selection passed to calculation.\n");
+        break;
+    }
 }
 
 void control_path(int input)
 {
     // Output a message regarding correct user selection.
+    long long value = 0;
     switch (input)
     {
     case 1:
         cout << "Permutation selected.\n";
-        permutation();
+        value = calculate(input);
         break;
     case 2:
         cout << "Combination selected.\n";
-        combo();
+        value = calculate(input);
         break;
     default:
         cout << "Error, incorrect selection.\n";
         break;
     }
+
+    cout << "Value is " << value << "\n\n\n";
 }
 
 void select_option()
 {
     // Finalize correct user selection.
-    int input = get_int();
+    long long input = get_int();
     control_path(input);
 
     while (input != 1 && input != 2)
     {
-        int input = get_int();
+        long long input = get_int();
         control_path(input);
     }
 }
