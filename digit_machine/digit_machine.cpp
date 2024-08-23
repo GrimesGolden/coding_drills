@@ -79,27 +79,132 @@ void pop_front(string& digits)
     if (!digits.empty())
     {
         digits.erase(digits.begin());
-        cout << "Popped from digits now contains: " << digits << "\n";
     }
 }
 
-void thousand(string& digits)
+int one(string& digits, int& number, int& max_size)
+{
+    //Purpose: converts the given strings tenth digit into an integer and text display
+    // Pre Condition: A string of digits, and the number to continue converting, as well as max_size, all passed by reference 
+    // Post Condition: Returns the final number, as the last in the chain of calling functions. 
+    // Calling function: Ten
+    int digit = 0;
+
+
+    if (valid_string(digits) && digits.size() == max_size)
+    {
+        digit = char_to_int(digits[0]);
+        cout << digit << " ones.\n"; // print message
+        digit *= max_size;
+        number += digit;
+    }
+
+    pop_front(digits);
+
+    return number;
+
+}
+
+int ten(string& digits, int& number, int& max_size)
+{
+    //Purpose: converts the given strings tenth digit into an integer and text display. Also calls ones function.
+    // Pre Condition: A string of digits, and the number to continue converting, and max_size, passed by reference 
+    // Post Condition: int
+    // Calling function: Hundred
+    int digit = 0;
+    constexpr int tenth = 10;
+
+    if (valid_string(digits) && digits.size() == max_size)
+    {
+        digit = char_to_int(digits[0]);
+        cout << digit << " tens and "; // print message
+        digit *= tenth;
+        number += digit;
+        --max_size;
+
+        pop_front(digits);
+        one(digits, number, max_size);
+    }
+
+    pop_front(digits);
+    return one(digits, number, max_size);
+
+}
+
+int hundred(string& digits, int& number, int& max_size)
+{
+    //Purpose: converts the given strings hundredth digit into an integer and text display. Also calls tens function.
+    // Pre Condition: A string of digits, and the number to continue converting, and max_size passed by reference 
+    // Post Condition: int
+    // Calling function: Thousand
+    int digit = 0;
+    constexpr int h = 100;
+
+    if (valid_string(digits) && digits.size() == max_size)
+    {
+        digit = char_to_int(digits[0]);
+        cout << digit << " hundredths and "; // print message
+        digit *= h;
+        number += digit;
+        --max_size;
+
+        pop_front(digits);
+        return ten(digits, number, max_size);
+    }
+}
+
+int thousand(string& digits)
 {   
     // Converts the given strings first digit into thousandths, and then accurately calls upon the hundreds function to finish the task of conversion. 
     // Pre Condition: A string of digits with size == 4, passed by reference for modification.
-    // Post Condition: NONE
+    // Post Condition: int
 
     int number = 0;
     constexpr int t = 1000;
+    int max_size = 4;
 
-    if (valid_string(digits))
+    if (valid_string(digits) && digits.size() == max_size)
     {
         number = char_to_int(digits[0]);
         cout << " is " << number << " thousands and "; // print message
         number *= t;
-    }
+        --max_size;
 
-    pop_front(digits);
+        pop_front(digits);
+        return hundred(digits, number, max_size);
+    }
+}
+
+void convert_string(string& digits)
+{   
+    // Purpose: Converts the given string into a valid integer, while calling out the individual unit values.
+    // Pre Condition: Any string passed by ref. (Only valid strings will pass)
+    // Post Condition: None, simply converts and prints. But could be modifed to return an int if needed. 
+    int size = digits.size();
+    int naught = 0;
+    // Without thousands calling the other functions, simply pass a zero and the size of the input for accurate results. 
+
+    if (valid_string(digits))
+    {
+        switch (size)
+        {
+        case 4:
+            cout << "Value is: " << thousand(digits);
+            break;
+        case 3:
+            cout << "Value is: " << hundred(digits, naught, size);
+            break;
+        case 2:
+            cout << "Value is : " << ten(digits, naught, size);
+            break;
+        case 1:
+            cout << "Value is : " << one(digits, naught, size);
+            break;
+        default:
+            cout << "Error, fell through switch statement.\n";
+            break;
+        }
+    }
 }
 
 int main()
@@ -114,10 +219,7 @@ int main()
         if (valid_string(input))
         {
             cout << " is VALID.\n";
-            if (input.length() == 4)
-            {
-                thousand(input);
-            }
+            convert_string(input);
         }
         else
         {
