@@ -18,6 +18,12 @@
 
 #include "std_lib_facilities.h"
 
+const char quit = 'q';
+const char print = ';';
+const char number = '8';
+const string prompt = "> ";
+const string result = "= ";
+
 //------------------------------------------------------------------------------
 
 class Token{
@@ -37,6 +43,7 @@ public:
     Token_stream();   // make a Token_stream that reads from cin
     Token get();      // get a Token (get() is defined elsewhere)
     void putback(Token t);    // put a Token back
+    void ignore(char c); // Ignores input up to c.
 private:
     bool full = false;        // is there a Token in the buffer?
     Token buffer;     // here is where we keep a Token put back using putback()
@@ -62,8 +69,31 @@ void Token_stream::putback(Token t)
 
 //------------------------------------------------------------------------------
 
-Token Token_stream::get()
+void Token_stream::ignore(char c)
 {
+    if (full && c == buffer.kind)
+    {   
+        full = false; // effectively discard the c in buffer.
+        return;
+    }
+
+    full = false;
+
+    // now search input.
+    char ch = 0;
+    while (cin >> ch)
+    {
+        if (ch == c)
+            return;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+Token Token_stream::get()
+{   
+    // Read characters from cin and compose a token.
+
     if (full) {       // do we already have a Token ready?
         // remove token from buffer
         full = false;
@@ -71,22 +101,33 @@ Token Token_stream::get()
     }
 
     char ch;
+
     cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
 
     switch (ch) {
-    case '=':    // for "print"
-    case 'x':    // for "quit"
-    case '{': case '}': case '(': case ')': case '!': case '+': case '-': case '*': case '/':
+    case print:    // for "print"
+    case quit:    // for "quit"
+    case '{':
+    case '}':
+    case '(':
+    case ')':
+    case '!': 
+    case '+':
+    case '-':
+    case '*':
+    case '/': 
+    case '%':
         return Token(ch);        // let each character represent itself
-    case '.':
+
+    case '.': // A floating point literal can start with a dot.
     case '0': case '1': case '2': case '3': case '4':
-    case '5': case '6': case '7': case '8': case '9': // Thats a bug, there was no case for 8 here.
+    case '5': case '6': case '7': case '8': case '9': 
     {
         cin.putback(ch);         // put digit back into the input stream
         double val;
         cin >> val;   
         // read a floating-point number
-        return Token('8', val);   // let '8' represent "a number"
+        return Token(number, val);  
     }
     default:
         error("Bad token");
@@ -155,7 +196,7 @@ double primary()
         }
         return d;
     }
-    case '8':
+    case number:
     {
         // we use '8' to represent a number
         // We need to look at the next token (to see if its factorial).
@@ -174,6 +215,10 @@ double primary()
             return f; // return this value, and no not putback the '!' token (it has been used up here)
         }
     }
+    case '-':
+        return -primary();
+    case '+':
+        return primary(); 
     default:
         error("primary expected");
     }
@@ -198,6 +243,14 @@ double term()
             double d = primary();
             if (d == 0) error("divide by zero");
             left /= d;
+            t = ts.get();
+            break;
+        }
+        case '%':
+        {
+            double d = primary();
+            if (d == 0) error("%:divide by zero");
+            left = fmod(left, d);
             t = ts.get();
             break;
         }
@@ -235,35 +288,56 @@ double expression()
 
 //------------------------------------------------------------------------------
 
-int main()
-try
+void clean_up_mess()
+{
+    // Ignore all input up to ';'.
+    ts.ignore(print);
+
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+//------------------------------------------------------------------------------
+
+void calculate()
 {   
     cout << "Welcome to our simple calculator.\nPlease enter expression using floating point numbers.\n";
     cout << "Operators available are *, +, / and -\nTo print result enter =\nTo exit enter 'x'\n>>";
 
-    double val = 0;
-    while (cin) {
-        Token t = ts.get();
-        if (t.kind == 'x') 
-            break; // 'q' for quit
-        if (t.kind == '=')        // ';' for "print now"
-            cout << "=" << val << '\n';
-        else {
+    while (cin)
+    {
+        try
+        {
+            cout << prompt;
+            Token t = ts.get();
+            while (t.kind == print) // eat '='
+            {
+                t = ts.get();
+            }
+
+            if (t.kind == quit)
+            {
+                return;
+            }
+
             ts.putback(t);
-            val = expression();
-        }
-    }
-    keep_window_open();
+            cout << result << expression() << '\n';
+        } // end try
+        catch (exception& e)
+        {
+            cout << "ERROR CAUGHT.\n";
+            cerr << e.what() << "\n";
+            clean_up_mess();
+        } // end catch
+    } // end while
 }
-catch (exception& e) {
-    cerr << "error: " << e.what() << '\n';
-    keep_window_open();
-    return 1;
-}
-catch (...) {
-    cerr << "Oops: unknown exception!\n";
-    keep_window_open();
-    return 2;
+
+//------------------------------------------------------------------------------
+
+int main()
+{
+    calculate();
+    return 0;
 }
 
 //------------------------------------------------------------------------------
