@@ -173,6 +173,13 @@ double term()
 		left /= d;
 		break;
 		}
+		case '%':
+		{ // A bug? Either way the modulo capability did not exist. 
+			double d = primary();
+			if (d == 0) error("%:divide by zero");
+			left = fmod(left, d); //The C library function double fmod(double x, double y) returns the remainder of x divided by y.
+			break;
+		}
 		default:
 			ts.unget(t);
 			return left;
