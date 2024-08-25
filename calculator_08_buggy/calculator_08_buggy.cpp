@@ -53,8 +53,9 @@ Token Token_stream::get()
 	case '*':
 	case '/':
 	case '%':
-	case ';':
 	case '=':
+	case print: // Another bug, quit was not included in the switch statement. 
+	case quit:
 		return Token(ch);
 	case '.':
 	case '0':
@@ -79,7 +80,7 @@ Token Token_stream::get()
 			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch; // While getting the character ch, and its equal to an alphabet symbol or a digit s+= ch //DEBUG a bug was found here, should be s += ch not s = ch.
 			cin.unget(); // confused about these blank calls to unget(), it takes a token, these should not even get through the compiler imo. //should be putback() not unget(). 
 			if (s == declkey) return Token(let);
-			if (s == "quit") return Token(name); // not sure what this line is doing here, a red herring tossed in I think. DEBUG
+			//if (s == "quit") return Token(name); // not sure what this line is doing here, a red herring tossed in I think. DEBUG
 			return Token(name, s);
 		}
 		error("Bad token");
