@@ -11,10 +11,11 @@
 
 struct Token {
 	char kind;
-	double value;
+	double value = 0; // Stop the warning about value not being declared. 
 	string name;
-	Token(char ch) :kind(ch), value(0) { }
-	Token(char ch, double val) :kind(ch), value(val) { }
+	Token(char ch) :kind(ch), value(0) { } // default constructor
+	Token(char ch, double val) :kind(ch), value(val) { } // constructor for the case of a char (kind) with a double value
+	Token(char ch, string n) :kind(ch), name(n) { } // First bug, no constructor existed for the case of a string. Created constructor for initializing name with kind and string.
 };
 
 class Token_stream {
@@ -24,19 +25,23 @@ public:
 	Token_stream() :full(0), buffer(0) { }
 
 	Token get();
-	void unget(Token t) { buffer = t; full = true; }
+	void unget(Token t) { buffer = t; full = true; } // UNGET DEBUG
 
 	void ignore(char);
 };
 
 const char let = 'L';
-const char quit = 'Q';
+const char quit = 'q'; // another bug, quit was 'Q' not 'q'. 
 const char print = ';';
 const char number = '8';
 const char name = 'a';
 
+const string declkey = "let";
+
 Token Token_stream::get()
-{
+{	
+
+	// Bug 2: get() triggers "get undefined name t" after "let x = 2;"
 	if (full) { full = false; return buffer; }
 	char ch;
 	cin >> ch;
@@ -71,10 +76,10 @@ Token Token_stream::get()
 		if (isalpha(ch)) {
 			string s;
 			s += ch;
-			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s = ch;
-			cin.unget();
-			if (s == "let") return Token(let);
-			if (s == "quit") return Token(name);
+			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch; // While getting the character ch, and its equal to an alphabet symbol or a digit s+= ch //DEBUG a bug was found here, should be s += ch not s = ch.
+			cin.unget(); // confused about these blank calls to unget(), it takes a token, these should not even get through the compiler imo. //should be putback() not unget(). 
+			if (s == declkey) return Token(let);
+			if (s == "quit") return Token(name); // not sure what this line is doing here, a red herring tossed in I think. DEBUG
 			return Token(name, s);
 		}
 		error("Bad token");
@@ -105,7 +110,7 @@ vector<Variable> names;
 double get_value(string s)
 {
 	for (int i = 0; i < names.size(); ++i)
-		if (names[i].name == s) return names[i].value;
+		if (names[i].name == s) return names[i].value;  //DEBUG: BUG 2 is found here. s == 't'. 
 	error("get: undefined name ", s);
 }
 
