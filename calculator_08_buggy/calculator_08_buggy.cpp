@@ -10,42 +10,45 @@
 #include "std_lib_facilities.h"
 
 struct Token {
+	// Holds a token with a value, kind and possible name for Variable representations. 
 	char kind;
-	double value = 0; // Stop the warning about value not being declared. 
+	double value = 0; // Stops the warning about value not being declared. 
 	string name;
 	Token(char ch) :kind(ch), value(0) { } // default constructor
 	Token(char ch, double val) :kind(ch), value(val) { } // constructor for the case of a char (kind) with a double value
-	Token(char ch, string n) :kind(ch), name(n) { } // First bug, no constructor existed for the case of a string. Created constructor for initializing name with kind and string.
+	Token(char ch, string n) :kind(ch), name(n) { } // Constructor for initializing name with kind and string (Variable).
 };
 
 class Token_stream {
 	bool full;
 	Token buffer;
 public:
-	Token_stream() :full(0), buffer(0) { }
+	Token_stream() :full(0), buffer(0) { } // Stream intializes with empty buffer
 
-	Token get();
-	void unget(Token t) { buffer = t; full = true; } // UNGET DEBUG
+	Token get(); 
+	void unget(Token t) { buffer = t; full = true; }
 
 	void ignore(char);
 };
 
+// Various consts to improve efficiency and clarity.
 const char let = 'L';
-const char quit = 'q'; // another bug, quit was 'Q' not 'q'. 
+const char quit = 'q'; 
 const char print = ';';
 const char number = '8';
 const char name = 'a';
-
+const string prompt = "> ";
+const string result = "= ";
 const string declkey = "let";
 
 Token Token_stream::get()
 {	
 
-	// Bug 2: get() triggers "get undefined name t" after "let x = 2;"
 	if (full) { full = false; return buffer; }
 	char ch;
 	cin >> ch;
 	switch (ch) {
+		// In these cases, return only a char (Let the token represent itself.)
 	case '(':
 	case ')':
 	case '+':
@@ -54,9 +57,10 @@ Token Token_stream::get()
 	case '/':
 	case '%':
 	case '=':
-	case print: // Another bug, quit was not included in the switch statement. 
+	case print: 
 	case quit:
 		return Token(ch);
+		// For the following cases, the token holds its kind (number) as well as its double value. 
 	case '.':
 	case '0':
 	case '1':
@@ -68,27 +72,29 @@ Token Token_stream::get()
 	case '7':
 	case '8':
 	case '9':
-	{	cin.unget();
+	{	cin.unget(); // Put the character back into the input stream, then read it in as a double. 
 	double val;
 	cin >> val;
-	return Token(number, val);
+	return Token(number, val); // Call the appropriate constructor. 
 	}
 	default:
-		if (isalpha(ch)) {
+		// This handles all other cases, with specifics for the logic regarding a variable, example "let x = 2". 
+		if (isalpha(ch)) { // Is the character an alphabet symbol. 
 			string s;
-			s += ch;
-			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch; // While getting the character ch, and its equal to an alphabet symbol or a digit s+= ch //DEBUG a bug was found here, should be s += ch not s = ch.
-			cin.unget(); // confused about these blank calls to unget(), it takes a token, these should not even get through the compiler imo. //should be putback() not unget(). 
-			if (s == declkey) return Token(let);
-			//if (s == "quit") return Token(name); // not sure what this line is doing here, a red herring tossed in I think. DEBUG
-			return Token(name, s);
+			s += ch; // Begin filling a string with the character. 
+
+			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch; // While succesfully reading in a character ch, if its equal to an alphabet symbol or a digit, add it to the string s.
+			cin.unget(); // Put the character which ended this string filling process (perhaps a ';' or '=' for example) back into the cin buffer.
+			if (s == declkey) return Token(let); // If s is == "let" we are declaring a variable.
+			return Token(name, s); // Return a Token with the appropriate kind and string value, it will represent a variable. 
 		}
-		error("Bad token");
+		error("Bad token"); // Fall through. 
 	}
 }
 
 void Token_stream::ignore(char c)
 {
+	// Ignore input up to the appropriate character (c). 
 	if (full && c == buffer.kind) {
 		full = false;
 		return;
@@ -106,12 +112,14 @@ struct Variable {
 	Variable(string n, double v) :name(n), value(v) { }
 };
 
-vector<Variable> names;
+vector<Variable> names; // Hold the Variables created by declaration() calls. 
 
 double get_value(string s)
 {
+	// Getters and setters for variables in the names vector.
+	
 	for (int i = 0; i < names.size(); ++i)
-		if (names[i].name == s) return names[i].value;  //DEBUG: BUG 2 is found here. s == 't'. 
+		if (names[i].name == s) return names[i].value;  
 	error("get: undefined name ", s);
 }
 
@@ -132,12 +140,15 @@ bool is_declared(string s)
 	return false;
 }
 
-Token_stream ts;
+Token_stream ts; // Token stream created here.
 
-double expression();
+double expression(); // Declaration to appease functions below. 
 
 double primary()
-{
+{	
+	// Fufills the last portion of the grammar.
+	// A primary is a +/- number, an (expression) in parentheses, or the name of a variable (its value). 
+
 	Token t = ts.get();
 	switch (t.kind) {
 	case '(':
@@ -145,7 +156,7 @@ double primary()
 		double d = expression();
 		t = ts.get();
 		if (t.kind != ')') error("'(' expected");
-		return d; // This was another bug, the return statement was not present. 
+		return d;
 	}
 	case '-':
 		return -primary();
@@ -159,7 +170,10 @@ double primary()
 }
 
 double term()
-{
+{	
+	// Fufills the intermediate portion of the grammar. 
+	// A tern is a, primary*primary, primary/primary, or a primary%primary. 
+
 	double left = primary();
 	while (true) {
 		Token t = ts.get();
@@ -174,7 +188,7 @@ double term()
 		break;
 		}
 		case '%':
-		{ // A bug? Either way the modulo capability did not exist. 
+		{ 
 			double d = primary();
 			if (d == 0) error("%:divide by zero");
 			left = fmod(left, d); //The C library function double fmod(double x, double y) returns the remainder of x divided by y.
@@ -188,9 +202,13 @@ double term()
 }
 
 double expression()
-{
+{	
+	// The first portion of the grammar. 
+	// An expression is a term or term+term or term-term. 
+
 	double left = term();
-	while (true) {
+	while (true) { // This while loop is subtle, the default statement is the critical step which will locate a ';' statement and allow left value to be returned. 
+		// Example: 2+2 breaks and goes back into the very loop. 2+2; is what triggers a default and returns 4. 
 		Token t = ts.get();
 		switch (t.kind) {
 		case '+':
@@ -207,20 +225,23 @@ double expression()
 }
 
 double declaration()
-{
+{	
+	// Fufills the syntax of a declaration i.e "let x = 2+2;"
+
 	Token t = ts.get();
-	if (t.kind != 'a') error("name expected in declaration");
+	if (t.kind != name) error("name expected in declaration");
 	string name = t.name;
-	if (is_declared(name)) error(name, " declared twice");
+	if (is_declared(name)) error(name, " declared twice"); // This simply checks if any other Variable by the given name is present in the vector.
 	Token t2 = ts.get();
-	if (t2.kind != '=') error("= missing in declaration of ", name);
-	double d = expression();
-	names.push_back(Variable(name, d));
-	return d;
+	if (t2.kind != '=') error("= missing in declaration of ", name); // Must match above syntax.
+	double d = expression(); // Any valid expression is allowed in a declaration, but it be declared with some expression. No "let x;" allowed
+	names.push_back(Variable(name, d)); // The creation of a Variable occurs here. 
+	return d; // For the logic in functions below to work, declaration must return a value. 
 }
 
 double statement()
-{
+{	// Fufills a major portion of the grammar.
+	// A statement is either a declaration (a variable declaration) or an expression (mathematical). 
 	Token t = ts.get();
 	switch (t.kind) {
 	case let:
@@ -233,21 +254,25 @@ double statement()
 
 void clean_up_mess()
 {
+	// Ignore everything up to the print symbol. 
+	// Also clears the cin buffer and ignores, to prepare for a clean input.
 	ts.ignore(print);
+	cin.clear();
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
-const string prompt = "> ";
-const string result = "= ";
 
 void calculate()
 {
 	while (true) try {
+		// Note that we catch errors inside the loop, meaning loop continues after printing and cleanup.
 		cout << prompt;
 		Token t = ts.get();
-		while (t.kind == print) t = ts.get();
-		if (t.kind == quit) return;
-		ts.unget(t);
-		cout << result << statement() << endl;
+		while (t.kind == print) t = ts.get(); // If the token is ';' get more input. This is why the prompt works 
+		//This will disregard further ;; characters. While maintaining the loop.
+		if (t.kind == quit) return; // Exit the loop with 'q'
+		ts.unget(t); // Put the token back, we just wanted to check if it was a quit or a print. 
+		cout << result << statement() << endl; // The all important call to statement. 
 	}
 	catch (runtime_error& e) {
 		cerr << e.what() << endl;
