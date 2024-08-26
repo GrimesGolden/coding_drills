@@ -37,6 +37,7 @@ const char quit = 'q';
 const char print = ';';
 const char number = '8';
 const char name = 'a';
+const char square_root = 'S';
 const string prompt = "> ";
 const string result = "= ";
 const string declkey = "let";
@@ -86,6 +87,7 @@ Token Token_stream::get()
 			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch; // While succesfully reading in a character ch, if its equal to an alphabet symbol or a digit, add it to the string s.
 			cin.unget(); // Put the character which ended this string filling process (perhaps a ';' or '=' for example) back into the cin buffer.
 			if (s == declkey) return Token(let); // If s is == "let" we are declaring a variable.
+			if (s == "sqrt") return Token(square_root); // I will let 'S' represent a square root call.
 			return Token(name, s); // Return a Token with the appropriate kind and string value, it will represent a variable. 
 		}
 		error("Bad token"); // Fall through. 
@@ -143,6 +145,7 @@ bool is_declared(string s)
 Token_stream ts; // Token stream created here.
 
 double expression(); // Declaration to appease functions below. 
+double statement();
 
 double primary()
 {	
@@ -164,6 +167,15 @@ double primary()
 		return t.value;
 	case name:
 		return get_value(t.name);
+	case square_root:
+	{
+		t = ts.get(); // Must disregard '('
+		if (t.kind != '(') error("'(' expected"); // ts.get() will find most bad tokens but expressions like sqrt*2); are more subtle.
+		double d = expression(); // Get the inner expression from sqrt(expression());
+		t = ts.get(); // Have to disregard the outer ')' too; 
+		if (t.kind != ')') error("'(' expected");
+		return(sqrt(d));
+	}
 	default:
 		error("primary expected");
 	}
