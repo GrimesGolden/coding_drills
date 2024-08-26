@@ -283,6 +283,8 @@ void calculate()
 int main()
 
 try {
+	// Adding a predefined name k, meaning 1000.
+	names.push_back(Variable("k", 1000));
 	calculate();
 	return 0;
 }
