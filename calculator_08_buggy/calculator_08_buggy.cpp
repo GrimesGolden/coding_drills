@@ -147,6 +147,25 @@ Token_stream ts; // Token stream created here.
 double expression(); // Declaration to appease functions below. 
 double statement();
 
+double square(Token& t)
+{	
+	// Returns the square root of the given appropriate token.
+	// Pre-Condition: A square root token followed by (expression)
+	// Post-Condition: An appropriate double value (the square root.)
+
+	t = ts.get(); // Must disregard '('
+	if (t.kind != '(')  error("'(' expected"); // ts.get() will find most bad tokens but expressions like sqrt*2); are more subtle.
+	double d = expression(); // Get the inner expression from sqrt(expression());
+	t = ts.get(); // Have to disregard the outer ')' too; 
+	if (t.kind != ')') error("'(' expected");
+	if (d < 0)
+	{
+		error("Warning: negative square root detected. SWAT team deployed.\n");
+	}
+	else {
+		return sqrt(d);
+	}
+}
 double primary()
 {	
 	// Fufills the last portion of the grammar.
@@ -169,12 +188,7 @@ double primary()
 		return get_value(t.name);
 	case square_root:
 	{
-		t = ts.get(); // Must disregard '('
-		if (t.kind != '(') error("'(' expected"); // ts.get() will find most bad tokens but expressions like sqrt*2); are more subtle.
-		double d = expression(); // Get the inner expression from sqrt(expression());
-		t = ts.get(); // Have to disregard the outer ')' too; 
-		if (t.kind != ')') error("'(' expected");
-		return(sqrt(d));
+		return square(t);
 	}
 	default:
 		error("primary expected");
