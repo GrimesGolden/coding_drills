@@ -89,11 +89,11 @@ Token Token_stream::get()
 			string s;
 			s += ch; // Begin filling a string with the character. 
 
-			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch; // While succesfully reading in a character ch, if its equal to an alphabet symbol or a digit, add it to the string s.
+			while (cin.get(ch) && (isalpha(ch) || isdigit(ch) || ch == '_')) s += ch; // While succesfully reading in a character ch, if its equal to an alphabet symbol or a digit, add it to the string s.
 			cin.unget(); // Put the character which ended this string filling process (perhaps a ';' or '=' for example) back into the cin buffer.
 			if (s == declkey) return Token(let); // If s is == "let" we are declaring a variable.
 			if (s == root) return Token(square_root); // I will let 'S' represent a square root call.
-			if (s == power) return Token('P');
+			if (s == power) return Token('P'); // Let 'P' represent a call to pwr(x, i) function. 
 			return Token(name, s); // Return a Token with the appropriate kind and string value, it will represent a variable. 
 		}
 		error("Bad token"); // Fall through. 
