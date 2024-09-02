@@ -88,7 +88,7 @@ Token Token_stream::get()
 		if (isalpha(ch)) { // Is the character an alphabet symbol. 
 			string s;
 			s += ch; // Begin filling a string with the character. 
-
+			// First char cannot start with an underscore due to line 88, but subsequent chars may. 
 			while (cin.get(ch) && (isalpha(ch) || isdigit(ch) || ch == '_')) s += ch; // While succesfully reading in a character ch, if its equal to an alphabet symbol or a digit, add it to the string s.
 			cin.unget(); // Put the character which ended this string filling process (perhaps a ';' or '=' for example) back into the cin buffer.
 			if (s == declkey) return Token(let); // If s is == "let" we are declaring a variable.
@@ -133,7 +133,7 @@ double get_value(string s)
 
 void set_value(string s, double d)
 {
-	for (int i = 0; i <= names.size(); ++i)
+	for (int i = 0; i < names.size(); ++i)
 		if (names[i].name == s) {
 			names[i].value = d;
 			return;
@@ -214,9 +214,7 @@ double pow(Token& t)
 	{
 		for (i; i > 1; --i)
 		{
-			cout << "Value of x is " << x << "\n";
 			x *= original;
-			cout << "New value of x is " << x << "\n";
 		}
 	}
 
@@ -319,11 +317,22 @@ double declaration()
 	Token t = ts.get();
 	if (t.kind != name) error("name expected in declaration");
 	string name = t.name;
-	if (is_declared(name)) error(name, " declared twice"); // This simply checks if any other Variable by the given name is present in the vector.
+	//if (is_declared(name)) error(name, " declared twice"); // This simply checks if any other Variable by the given name is present in the vector. // DEBUG
 	Token t2 = ts.get();
 	if (t2.kind != '=') error("= missing in declaration of ", name); // Must match above syntax.
 	double d = expression(); // Any valid expression is allowed in a declaration, but it be declared with some expression. No "let x;" allowed
-	names.push_back(Variable(name, d)); // The creation of a Variable occurs here. 
+
+	if (is_declared(name))
+	{
+		// If the value exists redeclare it.
+		set_value(name, d);
+		cout << "Redeclaration  of variable: " << name << "\n";
+	}
+	else
+	{
+		// If the value does not exists create a new Variable.
+		names.push_back(Variable(name, d)); 
+	}
 	return d; // For the logic in functions below to work, declaration must return a value. 
 }
 
