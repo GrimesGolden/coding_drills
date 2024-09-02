@@ -44,6 +44,7 @@ const string prompt = "> ";
 const string result = "= ";
 const string declkey = "let";
 const string root = "sqrt";
+const string power = "pow";
 
 Token Token_stream::get()
 {	
@@ -61,6 +62,7 @@ Token Token_stream::get()
 	case '/':
 	case '%':
 	case '=':
+	case ',':
 	case print: 
 	case quit:
 		return Token(ch);
@@ -91,6 +93,7 @@ Token Token_stream::get()
 			cin.unget(); // Put the character which ended this string filling process (perhaps a ';' or '=' for example) back into the cin buffer.
 			if (s == declkey) return Token(let); // If s is == "let" we are declaring a variable.
 			if (s == root) return Token(square_root); // I will let 'S' represent a square root call.
+			if (s == power) return Token('P');
 			return Token(name, s); // Return a Token with the appropriate kind and string value, it will represent a variable. 
 		}
 		error("Bad token"); // Fall through. 
@@ -169,6 +172,57 @@ double square(Token& t)
 		return sqrt(d);
 	}
 }
+
+double primary(); // just declaring to stop an error in pow() function below. Used on line 190.
+
+double pow(Token& t)
+{
+	// Return x multiplied by itself i times.
+	// Pre Condition: A token to be followed by the inner expression.
+	// Post-Condition: An appropriate double value. 
+	t = ts.get(); // Must disregard '('
+	if (t.kind != '(')  error("'(' expected"); // ts.get() will find most bad tokens but expressions like sqrt*2); are more subtle.
+
+	double x = expression(); // Get the inner expression, this will represent the x in pow(x,i); 
+	double original = x; // Used to perform power operation. i.e 2*2*2 for 2^3. 
+
+	t = ts.get(); // This should be a comma or the call to pow(x,i) is invalid, as the comma is what remains in the token stream in a valid call.
+	if (t.kind != ',') error("Call must be in the form pow(x,i)");
+
+	int i = narrow_cast<int>(primary());
+	if (i < 0)
+	{
+		error("i must be >= 0\n");
+	}
+
+	t = ts.get();
+
+
+	if (t.kind != ')') error("'(' expected");
+
+	// Some magic numbers here, but I think we can disregard.
+	// We know these represent the basic power properties. i.e 2^0 == 1 and 2^1 == 2. 
+	if (i == 0)
+	{
+		return 1;
+	}
+	else if (i == 1)
+	{
+		return x;
+	}
+	else 
+	{
+		for (i; i > 1; --i)
+		{
+			cout << "Value of x is " << x << "\n";
+			x *= original;
+			cout << "New value of x is " << x << "\n";
+		}
+	}
+
+	return x; 
+}
+
 double primary()
 {	
 	// Fufills the last portion of the grammar.
@@ -192,6 +246,11 @@ double primary()
 	case square_root:
 	{
 		return square(t);
+	}
+	case 'P':
+		// 'P' represents a call to the pow function. 
+	{
+		return pow(t);
 	}
 	default:
 		error("primary expected");
