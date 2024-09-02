@@ -20,6 +20,8 @@ struct Token {
 };
 
 class Token_stream {
+	// Holds the current token, can carry a single Token in buffer. 
+	// Can discard the held Token. 
 	bool full;
 	Token buffer;
 public:
@@ -41,6 +43,7 @@ const char square_root = 'S';
 const string prompt = "> ";
 const string result = "= ";
 const string declkey = "let";
+const string root = "sqrt";
 
 Token Token_stream::get()
 {	
@@ -87,7 +90,7 @@ Token Token_stream::get()
 			while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch; // While succesfully reading in a character ch, if its equal to an alphabet symbol or a digit, add it to the string s.
 			cin.unget(); // Put the character which ended this string filling process (perhaps a ';' or '=' for example) back into the cin buffer.
 			if (s == declkey) return Token(let); // If s is == "let" we are declaring a variable.
-			if (s == "sqrt") return Token(square_root); // I will let 'S' represent a square root call.
+			if (s == root) return Token(square_root); // I will let 'S' represent a square root call.
 			return Token(name, s); // Return a Token with the appropriate kind and string value, it will represent a variable. 
 		}
 		error("Bad token"); // Fall through. 
