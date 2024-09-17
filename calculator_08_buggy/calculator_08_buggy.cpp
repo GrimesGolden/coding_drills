@@ -5,6 +5,12 @@
 	Helpful comments removed.
 
 	We have inserted 3 bugs that the compiler will catch and 3 that it won't.
+
+	how to use program: variables example let x = 2;
+	addition example 2+2; 
+	pow(2);
+	reassignment is allowed x = 4;
+	work on exercise 3. 
 */
 
 #include "std_lib_facilities.h"
@@ -89,6 +95,7 @@ Token Token_stream::get()
 			string s;
 			s += ch; // Begin filling a string with the character. 
 			// First char cannot start with an underscore due to line 88, but subsequent chars may. 
+			// Underscore needs to be valid in order to allow for underscore_variables
 			while (cin.get(ch) && (isalpha(ch) || isdigit(ch) || ch == '_')) s += ch; // While succesfully reading in a character ch, if its equal to an alphabet symbol or a digit, add it to the string s.
 			cin.unget(); // Put the character which ended this string filling process (perhaps a ';' or '=' for example) back into the cin buffer.
 			if (s == declkey) return Token(let); // If s is == "let" we are declaring a variable.
@@ -150,7 +157,7 @@ bool is_declared(string s)
 
 Token_stream ts; // Token stream created here.
 
-double expression(); // Declaration to appease functions below. 
+double expression(); // Declarations to appease functions below. 
 double statement();
 
 double square(Token& t)
