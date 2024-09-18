@@ -58,9 +58,11 @@ public:
 		var_table = {Variable("k", 1000), Variable("pi", 3.14159)};
 		const_table = { Variable("k", 1000), Variable("pi", 3.14159) };
 	}
-	//get()
-	//set()
-	//declare()
+	double get(string s);
+	void set(string s, double ds);
+	bool is_declared(string s);
+	bool is_constant(string s);
+	void declare(Variable v);
 
 };
 
@@ -155,38 +157,51 @@ void Token_stream::ignore(char c)
 vector<Variable> names; // Hold the Variables created by declaration() calls. 
 vector<Variable> consts; // Hold the constant values which cannot be modified by the user. 
 
-double get_value(string s)
+bool Symbol_table::is_constant(string s)
+{
+	for (int i = 0; i < const_table.size(); ++i)
+		if (const_table[i].name == s) return true;
+	return false;
+}
+
+bool Symbol_table::is_declared(string s)
+{
+	for (int i = 0; i < var_table.size(); ++i)
+		if (var_table[i].name == s) return true;
+	return false;
+}
+
+double Symbol_table::get(string s)
 {
 	// Getters and setters for variables in the names vector.
 	
-	for (int i = 0; i < names.size(); ++i)
-		if (names[i].name == s) return names[i].value;  
+	for (int i = 0; i < var_table.size(); ++i)
+		if (var_table[i].name == s) return var_table[i].value;  
 	error("get: undefined name ", s);
 }
 
-void set_value(string s, double d)
-{
-	for (int i = 0; i < names.size(); ++i)
-		if (names[i].name == s) {
-			names[i].value = d;
+void Symbol_table::set(string s, double d)
+{	
+	// Also needs to check for constants, function is_constant will be created above. 
+	if (is_constant(s))
+	{
+		error("Cannot redefine a constant variable");
+	}
+
+	for (int i = 0; i < var_table.size(); ++i)
+		if (var_table[i].name == s) {
+			var_table[i].value = d;
 			return;
 		}
 	error("set: undefined name ", s);
 }
 
-bool is_declared(string s)
+void Symbol_table::declare(Variable v)
 {
-	for (int i = 0; i < names.size(); ++i)
-		if (names[i].name == s) return true;
-	return false;
+	var_table.push_back(v);
 }
 
-bool is_constant(string s)
-{
-	for (int i = 0; i < consts.size(); ++i)
-		if (consts[i].name == s) return true;
-	return false;
-}
+
 
 Token_stream ts; // Token stream created here.
 Symbol_table st; // Symbol table created here. 
@@ -281,7 +296,7 @@ double primary()
 	case number:
 		return t.value;
 	case name:
-		return get_value(t.name);
+		return st.get(t.name);
 	case square_root:
 	{
 		return square(t);
@@ -363,20 +378,24 @@ double declaration()
 	if (t2.kind != '=') error("= missing in declaration of ", name); // Must match above syntax.
 	double d = expression(); // Any valid expression is allowed in a declaration, but it be declared with some expression. No "let x;" allowed
 
-	if (is_constant(name))
+	//if (is_constant(name)) // Dont need this anymore, because set itself checks for constants. 
+	//{
+	//	error("This variable cannot be redefined."); //constants cannot be redefined, this is best handled through an error. 
+	//} 
+	if (st.is_constant(name))
 	{
-		error("This variable cannot be redefined."); //constants cannot be redefined, this is best handled through an error. 
-	} 
-	else if (is_declared(name))
+		error("Redefinition of constant.");
+	}
+	else if (st.is_declared(name))
 	{
 		// If the value exists redeclare it.
-		set_value(name, d);
+		st.set(name, d);
 		cout << "Redeclaration  of variable: " << name << "\n";
 	}
 	else
 	{
 		// If the value does not exists create a new Variable.
-		names.push_back(Variable(name, d)); 
+		st.declare(Variable(name, d));
 	}
 	return d; // For the logic in functions below to work, declaration must return a value. 
 }
