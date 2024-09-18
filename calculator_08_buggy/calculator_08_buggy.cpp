@@ -128,6 +128,7 @@ struct Variable {
 };
 
 vector<Variable> names; // Hold the Variables created by declaration() calls. 
+vector<Variable> consts; // Hold the constant values which cannot be modified by the user. 
 
 double get_value(string s)
 {
@@ -152,6 +153,13 @@ bool is_declared(string s)
 {
 	for (int i = 0; i < names.size(); ++i)
 		if (names[i].name == s) return true;
+	return false;
+}
+
+bool is_constant(string s)
+{
+	for (int i = 0; i < consts.size(); ++i)
+		if (consts[i].name == s) return true;
 	return false;
 }
 
@@ -329,7 +337,11 @@ double declaration()
 	if (t2.kind != '=') error("= missing in declaration of ", name); // Must match above syntax.
 	double d = expression(); // Any valid expression is allowed in a declaration, but it be declared with some expression. No "let x;" allowed
 
-	if (is_declared(name))
+	if (is_constant(name))
+	{
+		error("This variable cannot be redefined."); //constants cannot be redefined, this is best handled through an error. 
+	} 
+	else if (is_declared(name))
 	{
 		// If the value exists redeclare it.
 		set_value(name, d);
@@ -388,7 +400,11 @@ int main()
 
 try {
 	// Adding a predefined name k, meaning 1000.
-	names.push_back(Variable("k", 1000));
+	names.push_back(Variable("k", 1000)); // Hard push of constant, this could be another function but might add more confusion at this point. 
+	consts.push_back(Variable("k", 1000));
+
+	names.push_back(Variable("pi", 3.14159));
+	consts.push_back(Variable("pi", 3.14159));
 	calculate();
 	return 0;
 }
