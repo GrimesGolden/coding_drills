@@ -39,6 +39,31 @@ public:
 	void ignore(char);
 };
 
+struct Variable {
+	string name;
+	double value;
+	Variable(string n, double v) :name(n), value(v) { }
+}; // required for symbol table below. 
+
+class Symbol_table {
+	// Holds vectors representing variables.
+	// Contains functionality for use of variables. 
+	vector<Variable> var_table;
+	vector<Variable> const_table;
+
+public:
+	// Constructor
+	Symbol_table() {
+		// Constructor, holding some consts. 
+		var_table = {Variable("k", 1000), Variable("pi", 3.14159)};
+		const_table = { Variable("k", 1000), Variable("pi", 3.14159) };
+	}
+	//get()
+	//set()
+	//declare()
+
+};
+
 // Various consts to improve efficiency and clarity.
 const char let = 'L';
 const char quit = 'q'; 
@@ -121,11 +146,11 @@ void Token_stream::ignore(char c)
 		if (ch == c) return;
 }
 
-struct Variable {
-	string name;
-	double value;
-	Variable(string n, double v) :name(n), value(v) { }
-};
+//struct Variable {
+	//string name;
+	//double value;
+	//Variable(string n, double v) :name(n), value(v) { }
+//};
 
 vector<Variable> names; // Hold the Variables created by declaration() calls. 
 vector<Variable> consts; // Hold the constant values which cannot be modified by the user. 
@@ -164,6 +189,7 @@ bool is_constant(string s)
 }
 
 Token_stream ts; // Token stream created here.
+Symbol_table st; // Symbol table created here. 
 
 double expression(); // Declarations to appease functions below. 
 double statement();
@@ -400,11 +426,11 @@ int main()
 
 try {
 	// Adding a predefined name k, meaning 1000.
-	names.push_back(Variable("k", 1000)); // Hard push of constant, this could be another function but might add more confusion at this point. 
-	consts.push_back(Variable("k", 1000));
+	//names.push_back(Variable("k", 1000)); // Hard push of constant, this could be another function but might add more confusion at this point. 
+	//consts.push_back(Variable("k", 1000));
 
-	names.push_back(Variable("pi", 3.14159));
-	consts.push_back(Variable("pi", 3.14159));
+	//names.push_back(Variable("pi", 3.14159));
+	//consts.push_back(Variable("pi", 3.14159));
 	calculate();
 	return 0;
 }
