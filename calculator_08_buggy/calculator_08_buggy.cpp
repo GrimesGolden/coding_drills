@@ -159,15 +159,19 @@ vector<Variable> consts; // Hold the constant values which cannot be modified by
 
 bool Symbol_table::is_constant(string s)
 {
-	for (int i = 0; i < const_table.size(); ++i)
-		if (const_table[i].name == s) return true;
+	for (const Variable& v : const_table)
+	{
+		if (v.name == s) return true;
+	}
 	return false;
 }
 
 bool Symbol_table::is_declared(string s)
 {
-	for (int i = 0; i < var_table.size(); ++i)
-		if (var_table[i].name == s) return true;
+	for (const Variable& v : var_table)
+	{
+		if (v.name == s) return true;
+	}
 	return false;
 }
 
@@ -175,8 +179,10 @@ double Symbol_table::get(string s)
 {
 	// Getters and setters for variables in the names vector.
 	
-	for (int i = 0; i < var_table.size(); ++i)
-		if (var_table[i].name == s) return var_table[i].value;  
+	for (const Variable& v : var_table)
+	{
+		if (v.name == s) return v.value; 
+	}
 	error("get: undefined name ", s);
 }
 
@@ -373,15 +379,10 @@ double declaration()
 	Token t = ts.get();
 	if (t.kind != name) error("name expected in declaration");
 	string name = t.name;
-	//if (is_declared(name)) error(name, " declared twice"); // This simply checks if any other Variable by the given name is present in the vector. // DEBUG
 	Token t2 = ts.get();
 	if (t2.kind != '=') error("= missing in declaration of ", name); // Must match above syntax.
 	double d = expression(); // Any valid expression is allowed in a declaration, but it be declared with some expression. No "let x;" allowed
 
-	//if (is_constant(name)) // Dont need this anymore, because set itself checks for constants. 
-	//{
-	//	error("This variable cannot be redefined."); //constants cannot be redefined, this is best handled through an error. 
-	//} 
 	if (st.is_constant(name))
 	{
 		error("Redefinition of constant.");
@@ -444,12 +445,6 @@ void calculate()
 int main()
 
 try {
-	// Adding a predefined name k, meaning 1000.
-	//names.push_back(Variable("k", 1000)); // Hard push of constant, this could be another function but might add more confusion at this point. 
-	//consts.push_back(Variable("k", 1000));
-
-	//names.push_back(Variable("pi", 3.14159));
-	//consts.push_back(Variable("pi", 3.14159));
 	calculate();
 	return 0;
 }
