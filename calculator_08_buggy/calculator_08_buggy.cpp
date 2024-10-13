@@ -2,22 +2,21 @@
 /*
 	calculator08buggy.cpp
 
-	Helpful comments removed.
+	The final version of Bjarnes calculator. 
+	Contains exercises for Chapter 7 1-4. 
 
-	We have inserted 3 bugs that the compiler will catch and 3 that it won't.
-
-	how to use program: variables example let x = 2;
-	addition example 2+2; 
+	how to use program: 
+	variables use the following format "let x = 5"
+	the rest follow format: "2+2;"
 	pow(2);
 	reassignment is allowed x = 4;
-	work on exercise 3. 
 */
 
 #include "std_lib_facilities.h"
 
 struct Token {
-	// Holds a token with a value, kind and possible name for Variable representations. 
-	char kind;
+	// This structure represents the basic form of Tokens in the game, used for the grammar. 
+	char kind; 
 	double value = 0; // Stops the warning about value not being declared. 
 	string name;
 	Token(char ch) :kind(ch), value(0) { } // default constructor
@@ -34,7 +33,7 @@ public:
 	Token_stream() :full(0), buffer(0) { } // Stream intializes with empty buffer
 
 	Token get(); 
-	void unget(Token t) { buffer = t; full = true; }
+	void unget(Token t) { buffer = t; full = true; } // Place a token back in the buffer.
 
 	void ignore(char);
 };
@@ -46,8 +45,7 @@ struct Variable {
 }; // required for symbol table below. 
 
 class Symbol_table {
-	// Holds vectors representing variables.
-	// Contains functionality for use of variables. 
+	// Holds both the users variables, and a list of contant variables we program in. 
 	vector<Variable> var_table;
 	vector<Variable> const_table;
 
@@ -55,7 +53,7 @@ public:
 	// Constructor
 	Symbol_table() {
 		// Constructor, holding some consts. 
-		var_table = {Variable("k", 1000), Variable("pi", 3.14159)};
+		var_table = {};
 		const_table = { Variable("k", 1000), Variable("pi", 3.14159) };
 	}
 	double get(string s);
@@ -70,7 +68,7 @@ public:
 const char let = 'L';
 const char quit = 'q'; 
 const char print = ';';
-const char number = '8';
+const char number = '8'; // Kind of wierd that is an 8 but good symbol to represent all numbers I guess. 
 const char name = 'a';
 const char square_root = 'S';
 const string prompt = "> ";
@@ -114,14 +112,15 @@ Token Token_stream::get()
 	{	cin.unget(); // Put the character back into the input stream, then read it in as a double. 
 	double val;
 	cin >> val;
-	return Token(number, val); // Call the appropriate constructor. 
+	return Token(number, val); // Call the appropriate constructor to create a number token with a double val. 
 	}
 	default:
 		// This handles all other cases, with specifics for the logic regarding a variable, example "let x = 2". 
 		if (isalpha(ch)) { // Is the character an alphabet symbol. 
 			string s;
-			s += ch; // Begin filling a string with the character. 
-			// First char cannot start with an underscore due to line 88, but subsequent chars may. 
+			s += ch; // Begin filling a string with the characters. 
+			// First char cannot start with an underscore, it will be found in the switch case above.
+			// But ones we enter the while loop, underscores are okay. 
 			// Underscore needs to be valid in order to allow for underscore_variables
 			while (cin.get(ch) && (isalpha(ch) || isdigit(ch) || ch == '_')) s += ch; // While succesfully reading in a character ch, if its equal to an alphabet symbol or a digit, add it to the string s.
 			cin.unget(); // Put the character which ended this string filling process (perhaps a ';' or '=' for example) back into the cin buffer.
@@ -148,15 +147,6 @@ void Token_stream::ignore(char c)
 		if (ch == c) return;
 }
 
-//struct Variable {
-	//string name;
-	//double value;
-	//Variable(string n, double v) :name(n), value(v) { }
-//};
-
-vector<Variable> names; // Hold the Variables created by declaration() calls. 
-vector<Variable> consts; // Hold the constant values which cannot be modified by the user. 
-
 bool Symbol_table::is_constant(string s)
 {
 	for (const Variable& v : const_table)
@@ -182,6 +172,12 @@ double Symbol_table::get(string s)
 	for (const Variable& v : var_table)
 	{
 		if (v.name == s) return v.value; 
+	}
+	// If its not a regular variable, maybe its a constant. 
+
+	for (const Variable& v : const_table)
+	{
+		if (v.name == s) return v.value;
 	}
 	error("get: undefined name ", s);
 }
@@ -298,7 +294,7 @@ double primary()
 		return d;
 	}
 	case '-':
-		return -primary();
+		return primary();
 	case number:
 		return t.value;
 	case name:
