@@ -204,23 +204,22 @@ void Symbol_table::declare(Variable v)
 }
 
 
-
-Token_stream ts; // Token stream created here.
 Symbol_table st; // Symbol table created here. 
 
-double expression(); // Declarations to appease functions below. 
-double statement();
+double expression(Token_stream& token_stream); // Declarations to appease functions below. 
+double statement(Token_stream& token_stream);
+double primary(Token_stream& token_stream); // just declaring to stop an error in pow() function below. Used on line 190.
 
-double square(Token& t)
+double square(Token_stream& token_stream)
 {	
 	// Returns the square root of the given appropriate token.
 	// Pre-Condition: A square root token followed by (expression)
 	// Post-Condition: An appropriate double value (the square root.)
 
-	t = ts.get(); // Must disregard '('
+	Token t = token_stream.get(); // Must disregard '('
 	if (t.kind != '(')  error("'(' expected"); // ts.get() will find most bad tokens but expressions like sqrt*2); are more subtle.
-	double d = expression(); // Get the inner expression from sqrt(expression());
-	t = ts.get(); // Have to disregard the outer ')' too; 
+	double d = expression(token_stream); // Get the inner expression from sqrt(expression());
+	t = token_stream.get(); // Have to disregard the outer ')' too; 
 	if (t.kind != ')') error("'(' expected");
 	if (d < 0)
 	{
@@ -231,29 +230,27 @@ double square(Token& t)
 	}
 }
 
-double primary(); // just declaring to stop an error in pow() function below. Used on line 190.
-
-double pow(Token& t)
+double pow(Token_stream& token_stream)
 {
 	// Return x multiplied by itself i times.
 	// Pre Condition: A token to be followed by the inner expression.
 	// Post-Condition: An appropriate double value. 
-	t = ts.get(); // Must disregard '('
+	Token t = token_stream.get(); // Must disregard '('
 	if (t.kind != '(')  error("'(' expected"); // ts.get() will find most bad tokens but expressions like sqrt*2); are more subtle.
 
-	double x = expression(); // Get the inner expression, this will represent the x in pow(x,i); 
+	double x = expression(token_stream); // Get the inner expression, this will represent the x in pow(x,i); 
 	double original = x; // Used to perform power operation. i.e 2*2*2 for 2^3. 
 
-	t = ts.get(); // This should be a comma or the call to pow(x,i) is invalid, as the comma is what remains in the token stream in a valid call.
+	t = token_stream.get(); // This should be a comma or the call to pow(x,i) is invalid, as the comma is what remains in the token stream in a valid call.
 	if (t.kind != ',') error("Call must be in the form pow(x,i)");
 
-	int i = narrow_cast<int>(primary());
+	int i = narrow_cast<int>(primary(token_stream));
 	if (i < 0)
 	{
 		error("i must be >= 0\n");
 	}
 
-	t = ts.get();
+	t = token_stream.get();
 
 
 	if (t.kind != ')') error("'(' expected");
@@ -279,105 +276,105 @@ double pow(Token& t)
 	return x; 
 }
 
-double primary()
+double primary(Token_stream& token_stream)
 {	
 	// Fufills the last portion of the grammar.
 	// A primary is a +/- number, an (expression) in parentheses, or the name of a variable (its value). 
 
-	Token t = ts.get();
+	Token t = token_stream.get();
 	switch (t.kind) {
 	case '(':
 	{	
-		double d = expression();
-		t = ts.get();
+		double d = expression(token_stream);
+		t = token_stream.get();
 		if (t.kind != ')') error("'(' expected");
 		return d;
 	}
 	case '-':
-		return primary();
+		return primary(token_stream);
 	case number:
 		return t.value;
 	case name:
 		return st.get(t.name);
 	case square_root:
 	{
-		return square(t);
+		return square(token_stream);
 	}
 	case 'P':
 		// 'P' represents a call to the pow function. 
 	{
-		return pow(t);
+		return pow(token_stream);
 	}
 	default:
 		error("primary expected");
 	}
 }
 
-double term()
+double term(Token_stream& token_stream)
 {	
 	// Fufills the intermediate portion of the grammar. 
 	// A tern is a, primary*primary, primary/primary, or a primary%primary. 
 
-	double left = primary();
+	double left = primary(token_stream);
 	while (true) {
-		Token t = ts.get();
+		Token t = token_stream.get();
 		switch (t.kind) {
 		case '*':
-			left *= primary();
+			left *= primary(token_stream);
 			break;
 		case '/':
-		{	double d = primary();
+		{	double d = primary(token_stream);
 		if (d == 0) error("divide by zero");
 		left /= d;
 		break;
 		}
 		case '%':
 		{ 
-			double d = primary();
+			double d = primary(token_stream);
 			if (d == 0) error("%:divide by zero");
 			left = fmod(left, d); //The C library function double fmod(double x, double y) returns the remainder of x divided by y.
 			break;
 		}
 		default:
-			ts.unget(t);
+			token_stream.unget(t);
 			return left;
 		}
 	}
 }
 
-double expression()
+double expression(Token_stream& token_stream)
 {	
 	// The first portion of the grammar. 
 	// An expression is a term or term+term or term-term. 
 
-	double left = term();
+	double left = term(token_stream);
 	while (true) { // This while loop is subtle, the default statement is the critical step which will locate a ';' statement and allow left value to be returned. 
 		// Example: 2+2 breaks and goes back into the very loop. 2+2; is what triggers a default and returns 4. 
-		Token t = ts.get();
+		Token t = token_stream.get();
 		switch (t.kind) {
 		case '+':
-			left += term();
+			left += term(token_stream);
 			break;
 		case '-':
-			left -= term();
+			left -= term(token_stream);
 			break;
 		default:
-			ts.unget(t);
+			token_stream.unget(t);
 			return left;
 		}
 	}
 }
 
-double declaration()
+double declaration(Token_stream& token_stream)
 {	
 	// Fufills the syntax of a declaration i.e "let x = 2+2;"
 
-	Token t = ts.get();
+	Token t = token_stream.get();
 	if (t.kind != name) error("name expected in declaration");
 	string name = t.name;
-	Token t2 = ts.get();
+	Token t2 = token_stream.get();
 	if (t2.kind != '=') error("= missing in declaration of ", name); // Must match above syntax.
-	double d = expression(); // Any valid expression is allowed in a declaration, but it be declared with some expression. No "let x;" allowed
+	double d = expression(token_stream); // Any valid expression is allowed in a declaration, but it be declared with some expression. No "let x;" allowed
 
 	if (st.is_constant(name))
 	{
@@ -397,51 +394,52 @@ double declaration()
 	return d; // For the logic in functions below to work, declaration must return a value. 
 }
 
-double statement()
+double statement(Token_stream& token_stream)
 {	// Fufills a major portion of the grammar.
 	// A statement is either a declaration (a variable declaration) or an expression (mathematical). 
-	Token t = ts.get();
+	Token t = token_stream.get();
 	switch (t.kind) {
 	case let:
-		return declaration();
+		return declaration(token_stream);
 	default:
-		ts.unget(t);
-		return expression();
+		token_stream.unget(t);
+		return expression(token_stream);
 	}
 }
 
-void clean_up_mess()
+void clean_up_mess(Token_stream& token_stream)
 {
 	// Ignore everything up to the print symbol. 
 	// Also clears the cin buffer and ignores, to prepare for a clean input.
-	ts.ignore(print);
+	token_stream.ignore(print);
 	cin.clear();
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
 
-void calculate()
+void calculate(Token_stream& token_stream)
 {
 	while (true) try {
 		// Note that we catch errors inside the loop, meaning loop continues after printing and cleanup.
 		cout << prompt;
-		Token t = ts.get();
-		while (t.kind == print) t = ts.get(); // If the token is ';' get more input. This is why the prompt works 
+		Token t = token_stream.get();
+		while (t.kind == print) t = token_stream.get(); // If the token is ';' get more input. This is why the prompt works 
 		//This will disregard further ;; characters. While maintaining the loop.
 		if (t.kind == quit) return; // Exit the loop with 'q'
-		ts.unget(t); // Put the token back, we just wanted to check if it was a quit or a print. 
-		cout << result << statement() << endl; // The all important call to statement. 
+		token_stream.unget(t); // Put the token back, we just wanted to check if it was a quit or a print. 
+		cout << result << statement(token_stream) << endl; // The all important call to statement. 
 	}
 	catch (runtime_error& e) {
 		cerr << e.what() << endl;
-		clean_up_mess();
+		clean_up_mess(token_stream);
 	}
 }
 
 int main()
 
 try {
-	calculate();
+	Token_stream token_stream; // Token stream created here.
+	calculate(token_stream);
 	return 0;
 }
 catch (exception& e) {
