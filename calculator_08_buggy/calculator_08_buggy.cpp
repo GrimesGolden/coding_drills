@@ -31,6 +31,7 @@ class Token_stream {
 	Token buffer;
 public:
 	Token_stream() :full(0), buffer(0) { } // Stream intializes with empty buffer
+	Token_stream(istream& is) :full(0), buffer(0) { } // Stream intializes with an istream
 
 	Token get(); 
 	void unget(Token t) { buffer = t; full = true; } // Place a token back in the buffer.
@@ -45,7 +46,7 @@ struct Variable {
 }; // required for symbol table below. 
 
 class Symbol_table {
-	// Holds both the users variables, and a list of contant variables we program in. 
+	// Holds both the users variables, and a list of constant variables that are hard coded into the table for lookup. 
 	vector<Variable> var_table;
 	vector<Variable> const_table;
 
@@ -439,6 +440,7 @@ int main()
 
 try {
 	Token_stream token_stream; // Token stream created here.
+
 	calculate(token_stream);
 	return 0;
 }
