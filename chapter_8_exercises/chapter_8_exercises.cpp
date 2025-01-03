@@ -337,7 +337,7 @@ struct Data
 Data compute_stats(vector<double> numbs)
 {
     // Completes exercise 11. 
-    cout << "COmputing dat shit.\n";
+    cout << "Computing statistics.\n";
 
     Data stats; 
 
@@ -351,20 +351,113 @@ Data compute_stats(vector<double> numbs)
     return stats;
 }
 
+void print_until_ss(const vector<string>& v, string quit)
+{   
+    int count = 0;
+    for (string s : v)
+    {
+        if (s == quit) {
+            ++count;
+        }
+
+        if (count == 2)
+        {
+            return;
+        }
+
+        cout << s << '\n';
+    }
+}
+
+vector<int> count_chars(const vector<string>& words)
+{   
+    vector<int> lengths;
+
+    for (string word : words)
+    {
+        int count = 0;
+        for (char c : word)
+        {
+            ++count;
+        }
+        lengths.push_back(count);
+    }
+
+    return lengths;
+}
+
+string longest_string(const vector<string>& words)
+{
+    vector<int> count = count_chars(words);
+
+    int max = count[0]; 
+    int index = 0; 
+
+    for (int i = 0; i < count.size(); ++i)
+    {
+        if (count[i] > max)
+        {
+            max = count[i];
+            index = i; 
+        }
+    }
+
+    return words[index]; 
+}
+
+string shortest_string(const vector<string>& words)
+{
+    vector<int> count = count_chars(words);
+
+    int min = count[0];
+    int index = 0;
+
+    for (int i = 0; i < count.size(); ++i)
+    {
+        if (count[i] < min)
+        {
+            min = count[i];
+            index = i;
+        }
+    }
+
+    return words[index];
+}
+
+string first(vector<string> words)
+{
+    sort(words.begin(), words.end());
+
+    return words[0];
+}
+
+string last(vector<string> words)
+{
+    sort(words.begin(), words.end());
+
+    return words[words.size() - 1];
+}
+
 
 int main()
-{   
+{
+    vector<string> words {
+        "apple", "banana", "cherry", "date", "elephant",
+        "forest", "giraffe", "honey", "island", "jungle",
+        "kite", "lemon", "mountain", "night", "ocean",
+        "pencil", "quartz", "river", "sunset", "tiger",
+        "umbrella", "violet", "whisper", "xylophone", "yacht"
+    };
 
-    vector<double> price {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    vector<double> weight {1, 2, 800, 801, -12, 1, 2, 3, 86};
+    vector<int> count = count_chars(words);
 
-    Data stats = compute_stats(weight);
+    for (int i = 0; i < words.size(); ++i)
+    {
+        cout << words[i] << " has length " << count[i] << ".\n";
+    }
 
-    cout << "Info is as follows\n";
-    cout << "mean: " << stats.mean << "\n";
-    cout << "median: " << stats.median << "\n";
-    cout << "min: " << stats.min << "\n";
-    cout << "max: " << stats.max << "\n";
+    cout << "The longest string is " << longest_string(words)  << "\n";
+    cout << "The shortest string is " << shortest_string(words) << "\n";
+    cout << "The lexicographically first word is " << first(words) << " and the lexicographically last is " << last(words) << "\n";
 
-    
 }
