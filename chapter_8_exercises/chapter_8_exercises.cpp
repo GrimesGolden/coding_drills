@@ -438,6 +438,11 @@ string last(vector<string> words)
     return words[words.size() - 1];
 }
 
+void read_const(const int numb)
+{
+    cout << "The number is " << numb << "\n";
+}
+
 
 int main()
 {
@@ -459,5 +464,7 @@ int main()
     cout << "The longest string is " << longest_string(words)  << "\n";
     cout << "The shortest string is " << shortest_string(words) << "\n";
     cout << "The lexicographically first word is " << first(words) << " and the lexicographically last is " << last(words) << "\n";
+
+    read_const(102); 
 
 }
