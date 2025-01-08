@@ -14,6 +14,10 @@ namespace Name
 
         void sort();
 
+        friend ostream& operator<<(ostream& os, const Name_pairs& np); // declare as a friend to give it direct access to the name and age vector, 
+
+        friend bool operator ==(const Name_pairs& left, const Name_pairs& right); 
+
     private:
         vector<string> name;
         vector<double> age;

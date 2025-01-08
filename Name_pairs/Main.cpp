@@ -8,16 +8,30 @@ using Name::Name_pairs;
 
 int main()
 {
-    Name_pairs pairs = Name_pairs(); 
+    cout << "We have created two pairs.\n";
 
-    pairs.read_names();
-    cout << "Now reading ages.\n";
-    pairs.read_ages();
-    pairs.print();
-    cout << "Sorting\n";
-    pairs.sort();
-    pairs.print();
-    cout << "RETEST.\n";
-    pairs.sort();
-    pairs.print(); 
+    Name_pairs first; 
+    Name_pairs second;
+
+    cout << "Reading first\n";
+    first.read_names();
+    first.read_ages();
+
+    cout << "Reading second\n";
+    second.read_names();
+    second.read_ages();
+
+    cout << "Are they equal?\n";
+
+    first.sort();
+
+    if (first == second)
+    {
+        cout << "YES\n";
+    } 
+    else
+    {
+        cout << "NAH.\n";
+    }
+
 }

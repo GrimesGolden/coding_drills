@@ -47,6 +47,9 @@ namespace Name
                 }
             }
         }
+
+        cin.clear(); // Stops input from being stored here. 
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 
     void Name_pairs::print()
@@ -86,4 +89,49 @@ namespace Name
         age = age_copy;
         // replace age[i] with the new index. 
     }
-}
+
+    // operator overloads
+    ostream& operator<<(ostream& os, const Name_pairs& np)
+    {
+        // print out name[i], age[i] pairs
+        for (int i = 0; i < np.name.size(); ++i)
+        {
+            os << np.name[i] << " is age " << np.age[i] << ".\n";
+        }
+
+        return os; 
+    }
+
+    bool operator ==(const Name_pairs& left, const Name_pairs& right)
+    {   
+        bool equal = true; 
+
+        for (int i = 0; i < left.name.size(); ++i)
+        {
+            if (left.name[i] != right.name[i])
+            {
+                equal = false;
+                break;
+            }
+        }
+
+        if (!equal)
+        {
+            return equal;
+        }
+        else
+        {
+            for (int i = 0; i < left.age.size(); ++i)
+            {
+                if (left.age[i] != right.age[i])
+                {
+                    equal = false;
+                    break;
+                }
+            }
+        }
+
+        return equal; 
+        
+    }
+} // End namespace Name
