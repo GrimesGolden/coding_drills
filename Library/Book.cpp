@@ -38,55 +38,37 @@ void Book::check_out()
 
 bool Book::validate() const
 {
-	//Perform simple validation such as ISBN can only be n - n - n - x where n is an integer and x is a digit or a letter.
-	// refactor me please god. 
+	//Perform simple validation such as ISBN can only be n - n - n - x where n is an integer and x is a digit or a letter. 
 	bool valid = true;
 
 	if (ISBN.size() != 7 || !isalpha(ISBN[ISBN.size() - 1]))
 	{
 		// Only valid ISBN are 7 chars
 		// If the last index is not alphanumeric, return false. 
-		valid = false;
-		return valid;
+		return false;
 	}
 
-
-	else
+	for (int i = 0; i < 6; ++i)
 	{
-		for (int i = 0; i < 6; ++i)
-		{
-			if (i % 2 == 0)
-			{
-				// Even
-				if (!isdigit(ISBN[i]))
-				{
-					valid = false;
-					break;
-				}
-			}
-			else if (i % 2 != 0)
-			{
-				if (ISBN[i] != '-')
-				{
-					valid = false;
-					break;
-				}
-			}
+		if (i % 2 == 0 && !isdigit(ISBN[i]) || i % 2 != 0 && ISBN[i] != '-')
+		{ 
+			return false; 
 		}
 	}
 
-	return valid; 
+	return true;
 }
 
-Book::Book(string isbn, string t, string a, Chrono::Date d, bool checked)
-	: ISBN{ isbn }, title{ t }, author{ a }, copyright{ d }, checked_in { checked }
+Book::Book(string isbn, string t, string a, Chrono::Date d, bool checked, Genre g)
+	: ISBN{ isbn }, title{ t }, author{ a }, copyright{ d }, checked_in { checked }, genre{ g }
 {
 	//if (!is_date(yy, mm, dd)) throw Invalid{};
 }
 
 Book& const default_book()
+// Create a default book in order to return values. 
 {
-	static Book db {"1-2-3-A", "A Default Book", "John Smith", Chrono::Date(), false}; // start of 21st century
+	static Book db {"1-2-3-A", "A Default Book", "John Smith", Chrono::Date(), false, Genre::nonfiction}; // start of 21st century
 	return db;
 }
 

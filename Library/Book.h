@@ -1,6 +1,11 @@
 #include "std_lib_facilities.h"
 #include "Chrono.h"
 
+enum class Genre
+{
+	fiction, nonfiction, periodical, biography, children
+};
+
 class Book
 {
 	// Its a book class, like for a library software
@@ -12,7 +17,7 @@ class Book
 	// ISBN is a string 
 
 public:
-	Book(string isbn, string t, string a, Chrono::Date d, bool checked); // constructor 
+	Book(string isbn, string t, string a, Chrono::Date d, bool checked, Genre g); // constructor 
 	Book(); // Default constructor. 
 
 	string get_ISBN() const;
@@ -38,6 +43,7 @@ private:
 	string author;
 	Chrono::Date copyright;
 	bool checked_in;
+	Genre genre; 
 
 };
 
