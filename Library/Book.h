@@ -30,12 +30,9 @@ public:
 
 	bool checked() const;
 
-
 	void check_in();
 
 	void check_out();
-
-	bool validate() const;
 
 private:
 	string ISBN;
@@ -52,3 +49,5 @@ bool operator==(const Book& a, const Book& b);
 bool operator!=(const Book& a, const Book& b);
 
 ostream& operator<<(ostream& os, const Book& b);
+
+bool valid_isbn(const string isbn);

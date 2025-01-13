@@ -14,12 +14,12 @@ int main()
         Book random_book{};
         Book other_book{ "1-3-3-A", "Chuck Fucklesons Guide to Hunting Rats", "Chuck Fuckleson", today, false , Genre::fiction };
 
-        if (other_book.validate())
+        if (valid_isbn(other_book.get_ISBN()))
         {
             cout << other_book.get_ISBN();
             cout << "\nYeah it's valid\n";
         }
-        else if (!other_book.validate())
+        else if (!valid_isbn(other_book.get_ISBN()))
         {
             cout << other_book.get_ISBN();
             cout << "\nNah it ain't valid.\n";
@@ -30,7 +30,7 @@ int main()
 
         random_book.get_date().add_day(35); //You can add days all you want, but it won't effect the actual value, because get_date only returns a value. 
 
-        cout << random_book;
+        cout << random_book << "\nSuccess!";
 
     }
     catch (const std::exception& e)

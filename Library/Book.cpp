@@ -36,37 +36,6 @@ void Book::check_out()
 	checked_in = false;
 }
 
-bool Book::validate() const
-{
-	//Perform simple validation such as ISBN can only be n - n - n - x where n is an integer and x is a digit or a letter. 
-
-	if (ISBN.size() != 7)
-	{
-		// Only valid ISBN are 7 chars
-		// If the last index is not alphanumeric, return false. 
-		return false;
-	}
-
-	for (int i = 0; i < 6; ++i)
-	{
-		if (i % 2 == 0 && !isdigit(ISBN[i]) || i % 2 != 0 && ISBN[i] != '-')
-			// If even and not a digit or odd and not a dash, then its false by definition of format. 
-		{ 
-			return false; 
-		}
-	}
-
-	// If we made it this far, then there can only be the last digit remaining.
-	if (isdigit(ISBN[ISBN.size() - 1]) || isalpha(ISBN[ISBN.size() - 1]))
-	{
-		return true;
-	} 
-	else
-	{
-		return false; 
-	}
-}
-
 Book& const default_book()
 // Create a default book in order to return values. 
 {
@@ -80,9 +49,9 @@ Book::Book()
 {
 	//if (!is_date(yy, mm, dd)) throw Invalid{};
 	// This should actually check for a valid ISBN and Date I believe. 
-	if (!Chrono::is_date(copyright.year(), copyright.month(), copyright.day()) || !validate())
+	if (!Chrono::is_date(copyright.year(), copyright.month(), copyright.day()) || !valid_isbn(ISBN))
 	{
-		throw Chrono::Date::Invalid{};
+		error("Invalid date or isbn detected.\n");
 	}
 }
 
@@ -90,9 +59,9 @@ Book::Book(string isbn, string t, string a, Chrono::Date d, bool checked, Genre 
 	: ISBN{ isbn }, title{ t }, author{ a }, copyright{ d }, checked_in{ checked }, genre{ g }
 // Utilizes user input to initalize the Book object. 
 {
-	if (!Chrono::is_date(copyright.year(), copyright.month(), copyright.day()) || !validate())
+	if (!Chrono::is_date(copyright.year(), copyright.month(), copyright.day()) || !valid_isbn(ISBN))
 	{
-		throw Chrono::Date::Invalid{};
+		error("Invalid date or isbn detected.\n");
 	}
 }
 
@@ -110,4 +79,33 @@ ostream& operator<<(ostream& os, const Book& b)
 {
 	os << "Title: " << b.get_title() << "\n" << "Author: " << b.get_author() << "\nISBN: " << b.get_ISBN() << "\nCopyright: " << b.get_date() << "\n";
 	return os; 
+}
+
+bool valid_isbn(const string isbn)
+{
+	if (isbn.size() != 7)
+	{
+		// Only valid ISBN are 7 chars
+		// If the last index is not alphanumeric, return false. 
+		return false;
+	}
+
+	for (int i = 0; i < 6; ++i)
+	{
+		if (i % 2 == 0 && !isdigit(isbn[i]) || i % 2 != 0 && isbn[i] != '-')
+			// If even and not a digit or odd and not a dash, then its false by definition of format. 
+		{
+			return false;
+		}
+	}
+
+	// If we made it this far, then there can only be the last digit remaining.
+	if (isdigit(isbn[isbn.size() - 1]) || isalpha(isbn[isbn.size() - 1]))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

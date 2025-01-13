@@ -25,3 +25,4 @@ private:
 	bool has_fee; 
 };
 
+bool valid_card(string card);
