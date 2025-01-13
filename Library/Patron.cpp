@@ -1,5 +1,8 @@
 #include "Patron.h";
 
+// Still need a function to validate the library card (it should be all numbers with length 6)
+// Also need a default constructor, similar to what we have with the book class. 
+
 void Patron::set_fee(double f)
 {
 	fees == f;

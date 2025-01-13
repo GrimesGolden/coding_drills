@@ -8,7 +8,7 @@ enum class Genre
 
 class Book
 {
-	// Its a book class, like for a library software
+	// Its a book class, as may occur in a library software for example
 	// Has members for the ISBN, title, author, and copyright date.
 	// Also stores data on whether the book is checked out.
 	// Create functions to return these values.

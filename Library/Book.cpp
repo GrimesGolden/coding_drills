@@ -39,9 +39,8 @@ void Book::check_out()
 bool Book::validate() const
 {
 	//Perform simple validation such as ISBN can only be n - n - n - x where n is an integer and x is a digit or a letter. 
-	bool valid = true;
 
-	if (ISBN.size() != 7 || !isalpha(ISBN[ISBN.size() - 1]))
+	if (ISBN.size() != 7)
 	{
 		// Only valid ISBN are 7 chars
 		// If the last index is not alphanumeric, return false. 
@@ -51,31 +50,50 @@ bool Book::validate() const
 	for (int i = 0; i < 6; ++i)
 	{
 		if (i % 2 == 0 && !isdigit(ISBN[i]) || i % 2 != 0 && ISBN[i] != '-')
+			// If even and not a digit or odd and not a dash, then its false by definition of format. 
 		{ 
 			return false; 
 		}
 	}
 
-	return true;
-}
-
-Book::Book(string isbn, string t, string a, Chrono::Date d, bool checked, Genre g)
-	: ISBN{ isbn }, title{ t }, author{ a }, copyright{ d }, checked_in { checked }, genre{ g }
-{
-	//if (!is_date(yy, mm, dd)) throw Invalid{};
+	// If we made it this far, then there can only be the last digit remaining.
+	if (isdigit(ISBN[ISBN.size() - 1]) || isalpha(ISBN[ISBN.size() - 1]))
+	{
+		return true;
+	} 
+	else
+	{
+		return false; 
+	}
 }
 
 Book& const default_book()
 // Create a default book in order to return values. 
 {
-	static Book db {"1-2-3-A", "A Default Book", "John Smith", Chrono::Date(), false, Genre::nonfiction}; // start of 21st century
+	static Book db {"1-2-3-A", "A Default Book", "Default Author", Chrono::Date(), false, Genre::nonfiction}; // start of 21st century
 	return db;
 }
 
 Book::Book()
+// Utilizes the default book function to preload the Book class with default valyes. 
 	: ISBN{ default_book().get_ISBN()}, title{ default_book().get_title() }, author{default_book().get_author()}, copyright{default_book().get_date()}, checked_in{default_book().checked()}
 {
 	//if (!is_date(yy, mm, dd)) throw Invalid{};
+	// This should actually check for a valid ISBN and Date I believe. 
+	if (!Chrono::is_date(copyright.year(), copyright.month(), copyright.day()) || !validate())
+	{
+		throw Chrono::Date::Invalid{};
+	}
+}
+
+Book::Book(string isbn, string t, string a, Chrono::Date d, bool checked, Genre g)
+	: ISBN{ isbn }, title{ t }, author{ a }, copyright{ d }, checked_in{ checked }, genre{ g }
+// Utilizes user input to initalize the Book object. 
+{
+	if (!Chrono::is_date(copyright.year(), copyright.month(), copyright.day()) || !validate())
+	{
+		throw Chrono::Date::Invalid{};
+	}
 }
 
 bool operator==(const Book& a, const Book& b)
