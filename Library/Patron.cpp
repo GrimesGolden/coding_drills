@@ -1,4 +1,4 @@
-#include "Patron.h";
+#include "Patron.h"
 #include "std_lib_facilities.h"
 
 // Still need a function to validate the library card (it should be all numbers with length 6)
@@ -6,7 +6,7 @@
 
 void Patron::set_fee(double f)
 {
-	fees == f;
+	fees += f;
 }
 
 string Patron::get_name() const
@@ -49,6 +49,11 @@ bool valid_card(string card)
 	}
 
 	return true;
+}
+
+bool Patron::fee() const
+{
+	return has_fee; 
 }
 
 Patron::Patron()
