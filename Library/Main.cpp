@@ -3,6 +3,7 @@
 #include "Chrono.h"
 #include "Book.h"
 #include "Library.h"
+#include "Patron.h"
 
 int main()
 {
@@ -11,7 +12,7 @@ int main()
 
         Chrono::Date today{2025, Chrono::Month::jan, 13};
         Book default_book{};
-        Book other_book{ "1-3-3-A", "Chuck Fucklesons Guide to Hunting Rats", "Chuck Fuckleson", today, false , Genre::fiction };
+        Book other_book{ "1-3-3-A", "Chuck Rucksacks Guide to Hunting Rats", "Chuck Rucksack", today, false , Genre::fiction };
         Book another_book{ "1-2-3-A", "A Skeptics Guide to Skepticism", "Lord Bigglesworth", today, false , Genre::fiction };
         Book a_book{ "1-2-3-B", "Gysops Fables", "Count Frack", today, false , Genre::fiction };
 

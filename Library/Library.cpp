@@ -2,6 +2,7 @@
 #include "Library.h"
 #include "Chrono.h"
 #include "Book.h"
+
 void Library::add_book(Book book)
 {
 	if (valid_isbn(book.get_ISBN()))
@@ -67,6 +68,7 @@ void Library::check_out(Book book, Patron patron, Chrono::Date date)
 	new_transaction.patron = patron;
 
 	transactions.push_back(new_transaction); 
+	cout << "Checked out book " << book << " by patron: " << patron.get_name() << " on " << date << "\n";
 	patron.set_fee(5);
 }
 

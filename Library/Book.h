@@ -2,10 +2,6 @@
 #include "std_lib_facilities.h"
 #include "Chrono.h"
 
-class Library;  // Forward declaration of Library class
-
-struct Transaction;
-
 enum class Genre
 {
 	fiction, nonfiction, periodical, biography, children

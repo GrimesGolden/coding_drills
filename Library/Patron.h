@@ -1,10 +1,6 @@
 #pragma once
 #include "std_lib_facilities.h"
 #include "Chrono.h"
-#include "Book.h"
-
-class Book;
-class Library;
 
 class Patron
 {
