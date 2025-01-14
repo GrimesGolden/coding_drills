@@ -1,9 +1,9 @@
 #pragma once
 #include "std_lib_facilities.h"
 #include "Chrono.h"
+#include "Patron.h"
 
 class Book;  // Forward declaration of Book class
-class Patron;
 
 class Library
 // Create a library class

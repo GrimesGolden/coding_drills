@@ -7,6 +7,7 @@ void Library::add_book(Book book)
 	if (valid_isbn(book.get_ISBN()))
 	{
 		books.push_back(book);
+		cout << book.get_title() << " added succesfully.\n";
 	}
 	else
 	{

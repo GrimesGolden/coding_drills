@@ -2,6 +2,7 @@
 //
 #include "Chrono.h"
 #include "Book.h"
+#include "Library.h"
 
 int main()
 {
@@ -9,28 +10,23 @@ int main()
     {
 
         Chrono::Date today{2025, Chrono::Month::jan, 13};
-        Book random_book{};
+        Book default_book{};
         Book other_book{ "1-3-3-A", "Chuck Fucklesons Guide to Hunting Rats", "Chuck Fuckleson", today, false , Genre::fiction };
+        Book another_book{ "1-2-3-A", "A Skeptics Guide to Skepticism", "Lord Bigglesworth", today, false , Genre::fiction };
+        Book a_book{ "1-2-3-B", "Gysops Fables", "Count Frack", today, false , Genre::fiction };
 
-        if (valid_isbn(other_book.get_ISBN()))
-        {
-            cout << other_book.get_ISBN();
-            cout << "\nYeah it's valid\n";
-        }
-        else if (!valid_isbn(other_book.get_ISBN()))
-        {
-            cout << other_book.get_ISBN();
-            cout << "\nNah it ain't valid.\n";
-        }
+        Library library; 
+        Patron some_guy; 
 
-        cout << random_book << "\n";
-        cout << other_book;
+        library.add_book(default_book); // Adding books to library
+        library.add_book(other_book);
+        library.add_book(another_book);
+        library.add_book(a_book);
+        library.add_patron(some_guy); // Adding patron to library
 
-        random_book.get_date().add_day(35); //You can add days all you want, but it won't effect the actual value, because get_date only returns a value. 
-
-        cout << random_book << "\nSuccess!";
-
+        library.check_out(default_book, some_guy, today); // Checking out book from the library. 
     }
+
     catch (const std::exception& e)
     {
         cout << e.what() << "\n";
