@@ -8,10 +8,16 @@
 #include "Chrono.h"
 using namespace Chrono;
 
+void verbose_print(Date& d)
+{
+    cout << "Today is " << d << " and that is " << d.days_since() << " days since January 1st 1970\n The day of the week is " << day_of_week(d);
+    cout << "\n The next sunday falls on " << next_Sunday(d) << "\n";
+    cout << "The next weekday is on " << next_weekday(d) << " which is a " << day_of_week(next_weekday(d)) << "\n";
+}
+
 int main()
 {
-    Date today{ 2006, Month::mar, 27 }; 
+    Date today{ 2026, Month::jan, 14 }; 
 
-    cout << "Today is " << today << " and that is " << today.days_since() << " days since January 1st 1970\n The day of the week is " << day_of_week(today);
-
+    verbose_print(today);
 }

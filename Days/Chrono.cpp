@@ -270,7 +270,7 @@ namespace Chrono {
 		h = day + first + y + floor((y / 4)) - floor(y / 100) + floor(y / 400);
 		h %= 7; 
 
-		Day current_day; 
+		Day current_day = Day::monday; 
 
 		switch (h)
 		{
@@ -303,12 +303,29 @@ namespace Chrono {
 	}
 
 	Date next_Sunday(const Date& d)
-	{
-		return Date(); // Placeholder just returns default day.
+	{	
+		Date d_copy = d;
+
+		while (day_of_week(d_copy) != Day::sunday)
+		{
+			d_copy.add_day(1);
+		}
+		return d_copy; // Placeholder just returns default day.
 	}
 
 	Date next_weekday(const Date& d)
 	{
-		return Date(); // Placeholder just returns default day. 
+		Date d_copy = d;
+
+		if (day_of_week(d_copy) == Day::saturday)
+		{
+			d_copy.add_day(2);
+		}
+		else
+		{
+			d_copy.add_day(1);
+		}
+
+		return d_copy; 
 	}
 } // Chrono
