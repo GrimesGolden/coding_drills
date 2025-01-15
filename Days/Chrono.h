@@ -27,6 +27,8 @@ namespace Chrono
 		int day() const { return d; }
 		Month month() const { return m; }
 		int year() const { return y; }
+		int days_in_month(Month m, int y) const;
+		int days_since() const;
 
 		// modifying operations:
 		void add_day(int n);
@@ -46,12 +48,10 @@ namespace Chrono
 	bool operator!=(const Date& a, const Date& b);
 
 	ostream& operator<<(ostream& os, const Date& d);
+	ostream& operator<<(ostream& os, const Day& d);
 	istream& operator>>(istream& is, Date& dd);
 
 	Day day_of_week(const Date& d); // day of week of d
 	Date next_Sunday(const Date& d); // next Sunday after d
 	Date next_weekday(const Date& d); // next weekday after d
-
-	// More helper functions
-	int days_in_month(const Date& d);
 } // End namespace chrono

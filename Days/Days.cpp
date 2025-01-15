@@ -10,10 +10,8 @@ using namespace Chrono;
 
 int main()
 {
-    Date today{ 2025, Month::jan, 14 };
+    Date today{ 2006, Month::mar, 27 }; 
 
-    cout << today; 
-    cout << "adding 3246 days\n";
-    today.add_day(7);
-    cout << "success" << today;
+    cout << "Today is " << today << " and that is " << today.days_since() << " days since January 1st 1970\n The day of the week is " << day_of_week(today);
+
 }
