@@ -9,10 +9,18 @@
 
 int main()
 {
-    Money test{ "EUR", 32312};
+    Money test{ "EUR", 32312 };
+    Money tester{ "USD", 42876 };
+    Money tests{ "GBP", 7892 };
 
     cout << test << "\n";
-    cout << convert(test) << "\n";
+    cout << "Converts to " << convert(test) << "\n";
+     
+    cout << tester << "\n";
+    cout << "Converts to " << convert(tester) << "\n";
+
+    cout << tests << "\n";
+    cout << "Converts to " << convert(tests) << "\n";
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

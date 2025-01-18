@@ -1,7 +1,6 @@
 #pragma once
 #include "std_lib_facilities.h"
-// Represent a monetary amount as a number of cents in a long int. 
-// But input and output as dollars and cents. 
+// Holds a string which can represent a currency such as USD, EUR, etc. 
 class Money
 {
 public:
